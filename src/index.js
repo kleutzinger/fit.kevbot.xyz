@@ -1,11 +1,16 @@
-const express = require("express");
+import express from "express";
 const app = express();
 const port = process.env.PORT || 5000;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
-// body parser
-const bodyParser = require("body-parser");
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import pkg from "body-parser";
+
+const { urlencoded } = pkg;
+
 // handle form data
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(urlencoded({ extended: true }));
 
 app.get("/machine-list", (_, res) => {
   const starterMachines = [
