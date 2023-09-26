@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import pkg from "body-parser";
+import { db, getMachines, getWorkouts, addMachine, addWorkout } from "./db.js";
 
 const { urlencoded } = pkg;
 
@@ -13,21 +14,9 @@ const { urlencoded } = pkg;
 app.use(urlencoded({ extended: true }));
 
 app.get("/machine-list", (_, res) => {
-  const starterMachines = [
-    "Tricep Extension",
-    "Leg Extension",
-    "Chest Press",
-    "Lat Pulldown",
-    "Seated Rows",
-    "Leg Lift",
-    "Pec Fly",
-    "Pec Fly (Reverse)",
-    "Bicep Curl",
-    "Shoulder Press",
-    "Stairs",
-  ];
+  const machines = db.prepare("SELECT * FROM machines").all();
   res.send(
-    html`${starterMachines.map((machine) => `<option>${machine}</option>`)}`,
+    html`${machines.map((machine) => `<option>${machine.name}</option>`)}`,
   );
 });
 

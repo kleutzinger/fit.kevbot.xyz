@@ -3,7 +3,7 @@
 ## things to have
 
 - [ ] big buttons easy to press on phone
-- [ ] push data to database or google sheet
+- [x] push data to database or google sheet
 - [ ] add new workout
 - [ ] display historical data
 
