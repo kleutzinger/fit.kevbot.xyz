@@ -6,7 +6,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import pkg from "body-parser";
-import { db, getMachines, getWorkouts, addMachine, addWorkout } from "./db.js";
+import {
+  db,
+  getMachineNames,
+  getWorkouts,
+  addMachineName,
+  addWorkout,
+  workoutSchema,
+} from "./db.js";
 
 const { urlencoded } = pkg;
 
@@ -14,15 +21,26 @@ const { urlencoded } = pkg;
 app.use(urlencoded({ extended: true }));
 
 app.get("/machine-list", (_, res) => {
-  const machines = db.prepare("SELECT * FROM machines").all();
-  res.send(
-    html`${machines.map((machine) => `<option>${machine.name}</option>`)}`,
-  );
+  const machines = getMachineNames();
+  res.send(html`${machines.map((machine) => `<option>${machine}</option>`)}`);
 });
 
-app.post("/submit-lift", (req, res) => {
+app.post("/submit-workout", (req, res) => {
   console.log(req.body);
-  res.send(`I will submit: ${JSON.stringify(req.body, null, 2)}`);
+  req.body.datetime = new Date().toISOString();
+  let submitObj = {};
+  try {
+    submitObj = workoutSchema.parse(req.body);
+  } catch (err) {
+    console.log(err);
+    res.send("Invalid workout");
+  }
+  const serverResp = addWorkout(submitObj);
+  res.send(
+    `I submitted: ${JSON.stringify(submitObj, null, 2)}  ${JSON.stringify(
+      serverResp,
+    )}`,
+  );
 });
 
 app.get("/", (_, res) => {
