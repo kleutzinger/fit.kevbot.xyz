@@ -1,0 +1,26 @@
+/* make background of document black */
+
+/** make everything really big for mobile **/
+
+* {
+  font-size: clamp(1rem, -0.875rem + 8.333vw, 3.5rem);
+}
+
+.reps-input,
+.weight-input {
+  width: 70%;
+  padding: 30px 10px;
+  line-height: 40%;
+  text-align: center;
+  outline: 2px solid black;
+  /* put on own line */
+  margin: 0 auto;
+}
+
+.reps-input {
+  background-color: #a2f2f2;
+}
+
+.weight-input {
+  background-color: #f2a2a2;
+}

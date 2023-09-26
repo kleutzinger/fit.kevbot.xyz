@@ -1,0 +1,19 @@
+<html lang="en">
+  <head>
+    <title>Admin page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <a href="/">go back</a>
+    <h1>Admin page</h1>
+    <form hx-post="/new-machine">
+      <input name="name" class="machine-input" type="text" />
+      <br />
+      <button class="btn btn-default">Submit new machine</button>
+    </form>
+    <p id="output"></p>
+  </body>
+</html>

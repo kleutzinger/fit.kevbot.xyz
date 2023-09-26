@@ -1,18 +1,37 @@
-!<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>Kevin's workout tracker</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="css/style.css" rel="stylesheet" />
+    <link href="/style.css" rel="stylesheet" />
   </head>
   <body>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
+      <input
+        name="weight"
+        class="weight-input"
+        inputmode="numeric"
+        required="required"
+        pattern="[0-9]{1,20}"
+        type="text"
+      />
       <label for="weight"> Weight </label>
-      <input type="number" name="weight" />
+      <br />
+      <input
+        name="reps"
+        class="reps-input"
+        inputmode="numeric"
+        required="required"
+        pattern="[0-9]{1,20}"
+        type="text"
+      />
       <label for="reps"> Reps </label>
-      <input type="number" name="reps" />
+      <br />
+      <br />
+      <br />
+      <label for="machine_name">Machine Name</label>
       <select
         name="machine_name"
         hx-get="/machine-list"
@@ -20,8 +39,9 @@
         hx-swap="innerHTML"
         hx-target="this"
       ></select>
-      <button class="btn btn-default">Submit</button>
+      <button class="btn btn-default">Submit lift</button>
     </form>
     <p id="output"></p>
+    <a href="/admin">admin</a>
   </body>
 </html>

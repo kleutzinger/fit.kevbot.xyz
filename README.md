@@ -7,11 +7,17 @@
 
 ## things to have
 
-- [ ] big buttons easy to press on phone
+- [x] big buttons easy to press on phone
 - [x] push data to sqlite ~or google sheet~
 - [x] submit a workout
-- [ ] add new machines in ui
+- [x] add new machines in ui
 - [ ] display historical data
+- [ ] support multiple users
+- [ ] support decimal parts for weight
+- [ ] undo last submit
+- [ ] make it look nicer
+- [ ] undo any submit
+- [ ] download db
 
 ## Rough UI
 

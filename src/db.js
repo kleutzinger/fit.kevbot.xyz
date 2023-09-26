@@ -21,8 +21,13 @@ const workoutSchema = z.object({
   datetime: z.coerce.string().datetime(),
 });
 
+const machineSchema = z.object({
+  name: z.string(),
+  datetime: z.coerce.string().datetime(),
+});
+
 const knownMachinesDef =
-  "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE);";
+  "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, datetime TEXT);";
 
 db.exec(knownMachinesDef);
 
@@ -39,11 +44,11 @@ const starterMachines = [
   "Bicep Curl",
   "Shoulder Press",
   "Stairs",
-].map((name) => ({ name }));
+].map((name) => ({ name, datetime: new Date().toISOString() }));
 
 // insert default machines if not already in db
 const insertMachine = db.prepare(
-  "INSERT OR IGNORE INTO machines (name) VALUES (@name)",
+  "INSERT OR IGNORE INTO machines (name, datetime) VALUES (@name, @datetime)",
 );
 
 const insertManyMachines = db.transaction((machines) => {
@@ -54,7 +59,6 @@ if (db.prepare("SELECT * FROM machines").all().length === 0) {
   insertManyMachines(starterMachines);
 }
 
-// insert into db
 const insert = db.prepare(
   "INSERT INTO workouts (machine_name, weight, reps, datetime) VALUES (@machine_name, @weight, @reps, @datetime)",
 );
@@ -81,8 +85,9 @@ const getMachineNames = () =>
 
 const getWorkouts = () => db.prepare("SELECT * FROM workouts").all();
 const addMachineName = (machine_name) => {
-  const obj = { name: machine_name };
+  const obj = { name: machine_name, datetime: new Date().toISOString() };
   insertManyMachines([obj]);
+  return obj;
 };
 
 export {
@@ -93,4 +98,5 @@ export {
   addMachineName,
   getWorkouts,
   workoutSchema,
+  machineSchema,
 };
