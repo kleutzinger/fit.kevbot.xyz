@@ -1,14 +1,27 @@
 !<!doctype html>
 <html lang="en">
   <head>
-    <title></title>
+    <title>Kevin's workout tracker</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="css/style.css" rel="stylesheet" />
   </head>
   <body>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <!-- have a button POST a click via AJAX -->
-    <button hx-post="/clicked" hx-swap="outerHTML">Click Me</button>
+    <form hx-post="/submit-lift" hx-swap="innerHTML" hx-target="#output">
+      <label for="weight"> Weight </label>
+      <input type="number" name="weight" />
+      <label for="reps"> Reps </label>
+      <input type="number" name="reps" />
+      <select
+        name="machine"
+        hx-get="/machine-list"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+        hx-target="this"
+      ></select>
+      <button class="btn btn-default">Submit</button>
+    </form>
+    <p id="output"></p>
   </body>
 </html>
