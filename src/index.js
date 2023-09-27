@@ -26,7 +26,7 @@ app.use(urlencoded({ extended: true }));
 import { auth } from "express-openid-connect";
 
 const config = {
-  authRequired: false,
+  authRequired: true,
   auth0Logout: true,
   secret: process.env.AUTH_RANDOM_STRING,
   baseURL: "http://localhost:5000",
@@ -84,7 +84,7 @@ app.get("/admin", (_, res) => {
 });
 
 app.get("/", (req, res) => {
-  console.log(req.oidc.user.email);
+  console.log(req?.oidc?.user?.email);
   res.sendFile(__dirname + "/index.html");
 });
 
