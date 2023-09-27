@@ -3,6 +3,7 @@ dotenv.config();
 import express from "express";
 const app = express();
 const port = process.env.PORT || 5000;
+const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
 import path from "path";
 import { fileURLToPath } from "url";
@@ -29,10 +30,11 @@ const config = {
   authRequired: true,
   auth0Logout: true,
   secret: process.env.AUTH_RANDOM_STRING,
-  baseURL: "http://localhost:5000",
+  baseURL: base_url,
   clientID: "wILIKtGWGdGjw83OQoxrvCXdqKJy97LX",
   issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
 };
+
 
 // auth router attaches /login, /logout, and /callback routes to the baseURL
 app.use(auth(config));
