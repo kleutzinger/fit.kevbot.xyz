@@ -3,16 +3,8 @@ dotenv.config();
 import { z } from "zod";
 import { join } from "path";
 import Database from "better-sqlite3";
-const DB_NAME = process.env.DB_NAME || "foobar.db";
 const DB_DIR = process.env.DB_DIR || "./db";
-const DB_PATH = join(DB_DIR, DB_NAME);
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
-
-const workoutTableDef =
-  "CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, machine_name TEXT, weight INTEGER, reps INTEGER, datetime TEXT)";
-
-db.exec(workoutTableDef);
+const dbs = new Map();
 
 const workoutSchema = z.object({
   machine_name: z.string(),
@@ -26,50 +18,64 @@ const machineSchema = z.object({
   datetime: z.coerce.string().datetime(),
 });
 
-const knownMachinesDef =
-  "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, datetime TEXT);";
-
-db.exec(knownMachinesDef);
-
-// insert default machines
-const starterMachines = [
-  "Tricep Extension",
-  "Leg Extension",
-  "Chest Press",
-  "Lat Pulldown",
-  "Seated Rows",
-  "Leg Lift",
-  "Pec Fly",
-  "Pec Fly (Reverse)",
-  "Bicep Curl",
-  "Shoulder Press",
-  "Stairs",
-].map((name) => ({ name, datetime: new Date().toISOString() }));
-
-// insert default machines if not already in db
-const insertMachine = db.prepare(
-  "INSERT OR IGNORE INTO machines (name, datetime) VALUES (@name, @datetime)",
-);
-
-const insertManyMachines = db.transaction((machines) => {
-  for (const machine of machines) insertMachine.run(machine);
-});
-
-if (db.prepare("SELECT * FROM machines").all().length === 0) {
-  insertManyMachines(starterMachines);
+function getDB(db_name) {
+  if (!dbs.has(db_name)) {
+    dbs.set(db_name, new Database(join(DB_DIR, db_name)));
+    console.log("initting db " + db_name);
+    initDB(dbs.get(db_name));
+  }
+  return dbs.get(db_name);
 }
 
-const insert = db.prepare(
-  "INSERT INTO workouts (machine_name, weight, reps, datetime) VALUES (@machine_name, @weight, @reps, @datetime)",
-);
+function initDB(db) {
+  const workoutTableDef =
+    "CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, machine_name TEXT, weight INTEGER, reps INTEGER, datetime TEXT)";
 
-const insertMany = db.transaction((workouts) => {
-  for (const workout of workouts) insert.run(workout);
-});
+  db.exec(workoutTableDef);
+  const knownMachinesDef =
+    "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, datetime TEXT);";
 
-const addWorkout = (workout) => {
+  db.exec(knownMachinesDef);
+
+  // insert default machines
+  const starterMachines = [
+    "Tricep Extension",
+    "Leg Extension",
+    "Chest Press",
+    "Lat Pulldown",
+    "Seated Rows",
+    "Leg Lift",
+    "Pec Fly",
+    "Pec Fly (Reverse)",
+    "Bicep Curl",
+    "Shoulder Press",
+    "Stairs",
+  ].map((name) => ({ name, datetime: new Date().toISOString() }));
+  if (db.prepare("SELECT * FROM machines").all().length === 0) {
+    insertManyMachines(starterMachines, db);
+  }
+}
+
+const insertManyMachines = (machines, db) => {
+  const insert = db.prepare(
+    "INSERT OR IGNORE INTO machines (name, datetime) VALUES (@name, @datetime)",
+  );
+  for (const machine of machines) {
+    insert.run(machine);
+  }
+};
+
+const insertManyWorkouts = (workouts, db) => {
+  for (const workout of workouts)
+    db.prepare(
+      "INSERT INTO workouts (machine_name, weight, reps, datetime) VALUES (@machine_name, @weight, @reps, @datetime)",
+    ).run(workout);
+};
+
+const addWorkout = (workout, db_name) => {
   try {
-    insertMany([workout]);
+    const db = getDB(db_name);
+    insertManyWorkouts([workout], db);
     return workout;
   } catch (err) {
     console.log(err);
@@ -77,22 +83,24 @@ const addWorkout = (workout) => {
   }
 };
 
-const getMachineNames = () =>
-  db
+const getMachineNames = (db_name) => {
+  return getDB(db_name)
     .prepare("SELECT * FROM machines")
     .all()
-    .map(({ name }) => name);
+    .map((x) => x.name);
+};
 
-const getWorkouts = () => db.prepare("SELECT * FROM workouts").all();
-const addMachineName = (machine_name) => {
+const getWorkouts = (db_name) =>
+  getDB(db_name).prepare("SELECT * FROM workouts").all();
+
+const addMachineName = (machine_name, db_name) => {
   const obj = { name: machine_name, datetime: new Date().toISOString() };
-  insertManyMachines([obj]);
+  insertManyMachines([obj], getDB(db_name));
   return obj;
 };
 
 export {
-  insertMany,
-  db,
+  insertManyWorkouts,
   addWorkout,
   getMachineNames,
   addMachineName,

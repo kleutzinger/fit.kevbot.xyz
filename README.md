@@ -12,12 +12,12 @@
 - [x] submit a workout
 - [x] add new machines in ui
 - [ ] display historical data
-- [ ] support multiple users
+- [x] support multiple users
 - [ ] support decimal parts for weight
 - [ ] undo last submit
 - [ ] make it look nicer
 - [ ] undo any submit
-- [ ] download db
+- [x] download db
 
 ## Rough UI
 
