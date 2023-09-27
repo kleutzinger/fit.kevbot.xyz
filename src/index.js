@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 const app = express();
 const port = process.env.PORT || 5000;
@@ -21,14 +23,26 @@ const { urlencoded } = pkg;
 // handle form data
 app.use(urlencoded({ extended: true }));
 
+import { auth } from "express-openid-connect";
+
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH_RANDOM_STRING,
+  baseURL: "http://localhost:5000",
+  clientID: "wILIKtGWGdGjw83OQoxrvCXdqKJy97LX",
+  issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
+};
+
+// auth router attaches /login, /logout, and /callback routes to the baseURL
+app.use(auth(config));
+
 app.get("/machine-list", (_, res) => {
   const machines = getMachineNames();
-  console.log(machines);
   res.send(html`${machines.map((machine) => `<option>${machine}</option>`)}`);
 });
 
 app.post("/submit-workout", (req, res) => {
-  console.log(req.body);
   req.body.datetime = new Date().toISOString();
   let submitObj = {};
   try {
@@ -69,7 +83,8 @@ app.get("/admin", (_, res) => {
   res.sendFile(__dirname + "/admin.html");
 });
 
-app.get("/", (_, res) => {
+app.get("/", (req, res) => {
+  console.log(req.oidc.user.email);
   res.sendFile(__dirname + "/index.html");
 });
 

@@ -6,7 +6,7 @@ import Database from "better-sqlite3";
 const DB_NAME = process.env.DB_NAME || "foobar.db";
 const DB_DIR = process.env.DB_DIR || "./db";
 const DB_PATH = join(DB_DIR, DB_NAME);
-const db = new Database(DB_PATH, { verbose: console.log });
+const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 
 const workoutTableDef =
