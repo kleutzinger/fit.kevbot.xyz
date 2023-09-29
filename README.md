@@ -2,7 +2,7 @@
 
 ## Definitions
 
-- Machine: a workout (eg: bicep curl, lat pulldown)
+- Machine: what exercise/activity you are doing (eg: bicep curl, lat pulldown, pushup?)
 - Workout: a single lift on a given machine (eg: bicep curl, 40 pounds, 10 reps)
 
 ## things to have

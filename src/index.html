@@ -76,10 +76,9 @@
         class="text-xl"
         id="workout-history"
         hx-get="/workouts?limit=20"
-        hx-trigger="load, workout-modified from:body"
+        hx-trigger="workout-modified from:body, onFocus, load"
         hx-swap="innerHTML"
-      >
-        </div>
+      ></div>
       <a class="text-lg" href="/admin">admin</a>
       <p
         class="text-center"
@@ -88,7 +87,22 @@
         hx-swap="innerHTML"
         hx-target="this"
       ></p>
-      </div>
     </div>
+    <script>
+      // https://htmx.org/api/#trigger
+      // reload workouts when the page gets focus
+      let firstFocus = true;
+      addEventListener("focus", (event) => {
+        // prevent double call on page load
+        if (firstFocus) {
+          firstFocus = false;
+          return;
+        }
+        htmx.trigger("#workout-history", "onFocus");
+      });
+      setTimeout(() => {
+        firstFocus = false;
+      }, 10000);
+    </script>
   </body>
 </html>

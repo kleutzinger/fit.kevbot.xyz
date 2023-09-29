@@ -173,7 +173,6 @@ app.get("/admin", (_, res) => {
 });
 
 app.get("/", (req, res) => {
-  console.log(req?.oidc?.user?.email);
   initUser(req?.oidc?.user?.email);
   res.sendFile(__dirname + "/index.html");
 });
