@@ -11,13 +11,21 @@
 - [x] push data to sqlite ~or google sheet~
 - [x] submit a workout
 - [x] add new machines in ui
-- [ ] display historical data
+- [ ] remove machines
+- [x] display historical data
+  - [ ] display per-machine
 - [x] support multiple users
 - [ ] support decimal parts for weight
 - [ ] undo last submit
-- [ ] make it look nicer
 - [ ] undo any submit
+- [ ] make it look nicer
+- [ ] edit any field from admin
+- [ ] delete rows from db
 - [x] download db
+- [x] remake into single db
+- [x] download db as csv
+- [ ] upload db as csv (advanced)
+- [ ] add tests
 
 ## Rough UI
 

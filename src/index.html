@@ -29,6 +29,9 @@
       />
       <label for="reps"> Reps </label>
       <br />
+      <input name="note" class="note-input" type="text" />
+      <label for="note"> Note </label>
+      <br />
       <br />
       <label for="machine_name">Machine Name</label>
       <select
@@ -41,6 +44,10 @@
       <button class="btn btn-default">Submit lift</button>
     </form>
     <p id="output"></p>
+    <button hx-get="/workouts" hx-target="#workout-target" hx-swap="innerHTML">
+      get workouts
+    </button>
+    <div id="workout-target"></div>
     <a href="/admin">admin</a>
   </body>
 </html>

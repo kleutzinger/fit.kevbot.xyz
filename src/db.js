@@ -3,39 +3,65 @@ dotenv.config();
 import { z } from "zod";
 import { join } from "path";
 import Database from "better-sqlite3";
+import { Parser } from "@json2csv/plainjs";
 const DB_DIR = process.env.DB_DIR || "./db";
-const dbs = new Map();
+const DB_NAME = process.env.DB_NAME || "db.sqlite";
+const DB_PATH = join(DB_DIR, DB_NAME);
+const db = new Database(DB_PATH, { verbose: console.log });
+db.pragma("journal_mode = WAL");
 
 const workoutSchema = z.object({
   machine_name: z.string(),
   weight: z.coerce.number().int(),
   reps: z.coerce.number().int(),
   datetime: z.coerce.string().datetime(),
+  note: z.string().optional(),
+  user_email: z.string(),
 });
 
 const machineSchema = z.object({
   name: z.string(),
   datetime: z.coerce.string().datetime(),
+  note: z.string().optional(),
+  user_email: z.string(),
 });
 
-function getDB(db_name) {
-  if (!dbs.has(db_name)) {
-    dbs.set(db_name, new Database(join(DB_DIR, db_name)));
-    console.log("initting db " + db_name);
-    initDB(dbs.get(db_name));
-  }
-  return dbs.get(db_name);
-}
+const userSchema = z.object({
+  email: z.string().email(),
+  note: z.string().optional(),
+  datetime: z.coerce.string().datetime(),
+});
 
-function initDB(db) {
+function initDB() {
   const workoutTableDef =
-    "CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, machine_name TEXT, weight INTEGER, reps INTEGER, datetime TEXT)";
+    "CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, machine_name TEXT, weight INTEGER, reps INTEGER, datetime TEXT, note TEXT, user_email TEXT)";
 
   db.exec(workoutTableDef);
   const knownMachinesDef =
-    "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, datetime TEXT);";
-
+    "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, datetime TEXT, note TEXT, user_email TEXT);";
   db.exec(knownMachinesDef);
+
+  const userTableDef =
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, note TEXT, datetime TEXT);";
+  db.exec(userTableDef);
+}
+
+function initUser(user_email) {
+  if (!user_email) throw new Error("user_email is required");
+  // check if user exists already
+  const maybeUser = db
+    .prepare("SELECT * FROM users WHERE email = ?")
+    .get(user_email);
+  if (maybeUser) return;
+
+  // add to user table
+  db.prepare(
+    "INSERT OR IGNORE INTO users (email, note, datetime) VALUES (@email, @note, @datetime)",
+  ).run({
+    email: user_email,
+    note: "New User",
+    datetime: new Date().toISOString(),
+  });
 
   // insert default machines
   const starterMachines = [
@@ -50,32 +76,33 @@ function initDB(db) {
     "Bicep Curl",
     "Shoulder Press",
     "Stairs",
-  ].map((name) => ({ name, datetime: new Date().toISOString() }));
-  if (db.prepare("SELECT * FROM machines").all().length === 0) {
-    insertManyMachines(starterMachines, db);
-  }
+  ].map((name) => ({
+    name,
+    datetime: new Date().toISOString(),
+    user_email: user_email,
+  }));
+  insertManyMachines(starterMachines);
 }
 
-const insertManyMachines = (machines, db) => {
+const insertManyMachines = (machines) => {
   const insert = db.prepare(
-    "INSERT OR IGNORE INTO machines (name, datetime) VALUES (@name, @datetime)",
+    "INSERT OR IGNORE INTO machines (name, datetime, user_email) VALUES (@name, @datetime, @user_email)",
   );
   for (const machine of machines) {
     insert.run(machine);
   }
 };
 
-const insertManyWorkouts = (workouts, db) => {
+const insertManyWorkouts = (workouts) => {
   for (const workout of workouts)
     db.prepare(
-      "INSERT INTO workouts (machine_name, weight, reps, datetime) VALUES (@machine_name, @weight, @reps, @datetime)",
+      "INSERT INTO workouts (machine_name, weight, reps, datetime, user_email, note) VALUES (@machine_name, @weight, @reps, @datetime, @user_email, @note)",
     ).run(workout);
 };
 
-const addWorkout = (workout, db_name) => {
+const addWorkout = (workout) => {
   try {
-    const db = getDB(db_name);
-    insertManyWorkouts([workout], db);
+    insertManyWorkouts([workout]);
     return workout;
   } catch (err) {
     console.log(err);
@@ -83,23 +110,50 @@ const addWorkout = (workout, db_name) => {
   }
 };
 
-const getMachineNames = (db_name) => {
-  return getDB(db_name)
-    .prepare("SELECT * FROM machines")
-    .all()
+const getMachineNames = (user_email) => {
+  return db
+    .prepare("SELECT * FROM machines WHERE user_email = ?")
+    .all(user_email)
     .map((x) => x.name);
 };
 
-const getWorkouts = (db_name) =>
-  getDB(db_name).prepare("SELECT * FROM workouts").all();
+const getWorkouts = (user_email) => {
+  return db
+    .prepare("SELECT * FROM workouts WHERE user_email = ?")
+    .all(user_email);
+};
 
-const addMachineName = (machine_name, db_name) => {
-  const obj = { name: machine_name, datetime: new Date().toISOString() };
-  insertManyMachines([obj], getDB(db_name));
+const addMachineName = (machine_name, user_email) => {
+  const obj = {
+    name: machine_name,
+    datetime: new Date().toISOString(),
+    user_email: user_email,
+  };
+  insertManyMachines([obj]);
   return obj;
 };
 
+function getCSV(user_email) {
+  try {
+    const workouts = getWorkouts(user_email);
+    const fieldsToRemove = ["id", "user_email"];
+    for (const workout of workouts) {
+      for (const field of fieldsToRemove) {
+        delete workout[field];
+      }
+    }
+    const parser = new Parser();
+    const csv = parser.parse(workouts);
+    return csv;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export {
+  initDB,
+  initUser,
+  getCSV,
   insertManyWorkouts,
   addWorkout,
   getMachineNames,
@@ -107,4 +161,5 @@ export {
   getWorkouts,
   workoutSchema,
   machineSchema,
+  DB_PATH,
 };
