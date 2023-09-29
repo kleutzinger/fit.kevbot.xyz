@@ -20,6 +20,9 @@
 - [ ] undo any submit
 - [x] make it look nicer
 - [ ] edit any field from admin
+- [ ] add column to order machines by
+- [x] auto update workout history onsubmit
+- [ ] optionally only show current machine's history
 - [ ] delete rows from db
 - [x] download db
 - [x] remake into single db

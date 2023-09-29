@@ -86,15 +86,14 @@ app.get("/download-csv", (req, res) => {
 });
 
 app.get("/workouts", (req, res) => {
+  const { limit } = req.query;
   const user_email = req2email(req);
-  const workouts = getWorkouts(user_email);
-  // sort reverse chronological
-  workouts.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+  const workouts = getWorkouts(user_email, limit);
   res.send(
     html`<table class="table-fixed">
       <thead>
         <tr>
-          ${["machine", "weight", "reps", "time", "note"]
+          ${["machine", "weight", "reps", "ago", "note"]
             .map((header) => {
               return html`<th scope="col" class="text-lg px-4 py4">
                 ${header}
@@ -134,7 +133,7 @@ app.post("/submit-workout", (req, res) => {
     }
     const serverResp = addWorkout(submitObj);
     res.setHeader("HX-Trigger", "workout-modified");
-    res.send(`server got: ${JSON.stringify(serverResp, null, 2)}`);
+    res.send(`submit success`);
   } catch (err) {
     console.error(err);
     res.send(err?.issues);

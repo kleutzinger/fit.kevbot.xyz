@@ -69,17 +69,17 @@
           >admin stuff</span
         >
       </div>
-      <a
+      <!-- <label for="cur-machine-only">Cur machine only</label> -->
+      <!-- <input type="checkbox" id="cur-machine-only" onchange="console.log(this.checked)" /> -->
+      <div
         href="#"
         class="text-xl"
-        hx-get="/workouts"
-        hx-target="#workout-target"
+        id="workout-history"
+        hx-get="/workouts?limit=20"
         hx-trigger="load, workout-modified from:body"
         hx-swap="innerHTML"
       >
-        get workouts
-      </a>
-      <div id="workout-target"></div>
+        </div>
       <a class="text-lg" href="/admin">admin</a>
       <p
         class="text-center"

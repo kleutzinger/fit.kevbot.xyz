@@ -119,10 +119,12 @@ const getMachineNames = (user_email) => {
     .map((x) => x.name);
 };
 
-const getWorkouts = (user_email) => {
+const getWorkouts = (user_email, limit) => {
   return db
-    .prepare("SELECT * FROM workouts WHERE user_email = ?")
-    .all(user_email);
+    .prepare(
+      "SELECT * FROM workouts WHERE user_email = ? ORDER BY datetime DESC LIMIT ?",
+    )
+    .all(user_email, limit || 10000);
 };
 
 const addMachineName = (machine_name, user_email) => {
