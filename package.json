@@ -10,7 +10,10 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "node test/test.js",
-    "build": "tailwindcss -i ./src/style.css -o ./src/output.css"
+    "build": "tailwindcss -i ./src/style.css -o ./src/output.css",
+    "dev": "concurrently \"npm:watch-node\" \"npm:watch-tailwind\"",
+    "watch-node": "nodemon src/index.js",
+    "watch-tailwind": "tailwindcss -i ./src/style.css -o ./src/output.css --watch"
   },
   "author": "Kevin Leutzinger",
   "license": "MIT",
@@ -27,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.6",
+    "concurrently": "^8.2.1",
     "nodemon": "^3.0.1",
     "tailwindcss": "^3.3.3"
   }
