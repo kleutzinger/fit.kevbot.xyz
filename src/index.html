@@ -8,7 +8,14 @@
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   </head>
   <body>
-    <div class="container mx-auto p-5">
+    <div class="grid grid-cols-1 justify-items-center p-8">
+      <div class="inline-flex items-center justify-center w-full">
+        <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+        <span
+          class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
+          >workout stuff</span
+        >
+      </div>
       <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
         <div>
           <select
@@ -55,6 +62,13 @@
         <button class="btn btn-blue">Submit lift</button>
       </form>
       <p id="output"></p>
+      <div class="inline-flex items-center justify-center w-full">
+        <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+        <span
+          class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
+          >admin stuff</span
+        >
+      </div>
       <a
         href="#"
         hx-get="/workouts"

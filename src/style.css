@@ -18,6 +18,10 @@ select {
   @apply mb-3;
 }
 
+body {
+  background-image: url("/bg.png");
+}
+
 .btn {
   @apply font-bold py-2 px-4 rounded;
 }

@@ -53,10 +53,14 @@ function req2email(req) {
   return req?.oidc?.user?.email;
 }
 
+app.use(express.static(join(__dirname, "..", "public")));
+
 app.get("/machine-list", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachineNames(user_email);
-  res.send(html`${machines.map((machine) => `<option>${machine}</option>`).join('')}`);
+  res.send(
+    html`${machines.map((machine) => `<option>${machine}</option>`).join("")}`,
+  );
 });
 
 app.get("/download-db", (req, res) => {
@@ -122,9 +126,7 @@ app.post("/submit-workout", (req, res) => {
       return res.send("Please fill out at least one field");
     }
     const serverResp = addWorkout(submitObj);
-    res.send(
-      `server got: ${JSON.stringify(serverResp, null, 2)}`,
-    );
+    res.send(`server got: ${JSON.stringify(serverResp, null, 2)}`);
   } catch (err) {
     console.error(err);
     res.send(err?.issues);
