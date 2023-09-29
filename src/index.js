@@ -56,7 +56,7 @@ function req2email(req) {
 app.get("/machine-list", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachineNames(user_email);
-  res.send(html`${machines.map((machine) => `<option>${machine}</option>`)}`);
+  res.send(html`${machines.map((machine) => `<option>${machine}</option>`).join('')}`);
 });
 
 app.get("/download-db", (req, res) => {
@@ -117,15 +117,17 @@ app.post("/submit-workout", (req, res) => {
   let submitObj = {};
   try {
     submitObj = workoutSchema.parse(req.body);
+    // check no note, weight=0, reps=0
+    if (!submitObj.note && !submitObj.weight && !submitObj.reps) {
+      return res.send("Please fill out at least one field");
+    }
     const serverResp = addWorkout(submitObj);
     res.send(
-      `I submitted: ${JSON.stringify(submitObj, null, 2)}  ${JSON.stringify(
-        serverResp,
-      )}`,
+      `server got: ${JSON.stringify(serverResp, null, 2)}`,
     );
   } catch (err) {
-    console.log(err);
-    res.send("Invalid workout");
+    console.error(err);
+    res.send(err?.issues);
   }
 });
 

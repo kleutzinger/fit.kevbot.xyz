@@ -10,38 +10,48 @@
   <body>
     <div class="container mx-auto p-5">
       <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
-        <select
-          name="machine_name"
-          hx-get="/machine-list"
-          hx-trigger="load"
-          hx-swap="innerHTML"
-          hx-target="this"
-        ></select>
-        <label for="machine_name">Machine Name</label>
-        <label for="weight">
+        <div>
+          <select
+            name="machine_name"
+            hx-get="/machine-list"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+            hx-target="this"
+          ></select>
+          <label for="machine_name">Machine Name</label>
+        </div>
+        <div>
+          <label for="weight">
+            <input
+              name="weight"
+              class="bg-red-200"
+              autocomplete="off"
+              inputmode="numeric"
+              pattern="[0-9]{1,20}"
+              type="text"
+            />
+            Weight
+          </label>
+        </div>
+        <div>
           <input
-            name="weight"
-            class="bg-red-200"
+            name="reps"
             autocomplete="off"
+            class="bg-green-200"
             inputmode="numeric"
-            required="required"
-            pattern="[0-9]{1,20}"
             type="text"
           />
-          Weight
-        </label>
-        <input
-          name="reps"
-          autocomplete="off"
-          class="bg-green-200"
-          inputmode="numeric"
-          required="required"
-          pattern="[0-9]{1,20}"
-          type="text"
-        />
-        <label for="reps"> Reps </label>
-        <input name="note" autocomplete="off" class="bg-blue-200" type="text" />
-        <label for="note"> Note </label>
+          <label for="reps"> Reps </label>
+        </div>
+        <div>
+          <input
+            name="note"
+            autocomplete="off"
+            class="bg-blue-200"
+            type="text"
+          />
+          <label for="note"> Note </label>
+        </div>
         <button class="btn btn-blue">Submit lift</button>
       </form>
       <p id="output"></p>

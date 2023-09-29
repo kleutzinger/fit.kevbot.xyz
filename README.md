@@ -18,7 +18,7 @@
 - [ ] support decimal parts for weight
 - [ ] undo last submit
 - [ ] undo any submit
-- [ ] make it look nicer
+- [x] make it look nicer
 - [ ] edit any field from admin
 - [ ] delete rows from db
 - [x] download db
