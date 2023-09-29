@@ -3,7 +3,7 @@ dotenv.config();
 import express from "express";
 import TimeAgo from "javascript-time-ago";
 // English.
-import en from "javascript-time-ago/locale/en";
+import en from "javascript-time-ago/locale/en.json";
 TimeAgo.addDefaultLocale(en);
 
 // Create formatter (English).
@@ -63,6 +63,12 @@ app.get("/machine-list", (req, res) => {
   );
 });
 
+app.get("/user-info", (req, res) => {
+  res.send(
+    html`<img class="h-16 w-16 m-5 mx-auto" src=${req.oidc.user.picture}></img><p>${req.oidc.user.email}</p>`,
+  );
+});
+
 app.get("/download-db", (req, res) => {
   const user_email = req2email(req);
   res.sendFile(join(__dirname, "..", db_dir, user_email));
@@ -85,26 +91,27 @@ app.get("/workouts", (req, res) => {
   // sort reverse chronological
   workouts.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
   res.send(
-    html`<table>
+    html`<table class="table-fixed">
       <thead>
         <tr>
-          <th>name</th>
-          <th>weight</th>
-          <th>reps</th>
-          <th>datetime</th>
-          <th>relative time</th>
-          <th>note</th>
+          ${["machine", "weight", "reps", "time", "note"]
+            .map((header) => {
+              return html`<th scope="col" class="text-lg px-4 py4">
+                ${header}
+              </th>`;
+            })
+            .join("")}
         </tr>
       </thead>
       <tbody>
         ${workouts
+          .slice(0, 20)
           .map((workout) => {
-            return html`<tr>
+            return html`<tr class="py-4 text-center">
               <td>${workout.machine_name}</td>
               <td>${workout.weight}</td>
               <td>${workout.reps}</td>
-              <td>${new Date(workout.datetime).toLocaleString()}</td>
-              <td>${timeAgo.format(new Date(workout.datetime))}</td>
+              <td>${timeAgo.format(new Date(workout.datetime), "mini")}</td>
               <td>${workout.note || ""}</td>
             </tr>`;
           })
@@ -126,6 +133,7 @@ app.post("/submit-workout", (req, res) => {
       return res.send("Please fill out at least one field");
     }
     const serverResp = addWorkout(submitObj);
+    res.setHeader("HX-Trigger", "workout-modified");
     res.send(`server got: ${JSON.stringify(serverResp, null, 2)}`);
   } catch (err) {
     console.error(err);

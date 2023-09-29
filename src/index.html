@@ -13,7 +13,7 @@
         <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
         <span
           class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
-          >workout stuff</span
+          >log a workout</span
         >
       </div>
       <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
@@ -71,14 +71,24 @@
       </div>
       <a
         href="#"
+        class="text-xl"
         hx-get="/workouts"
         hx-target="#workout-target"
+        hx-trigger="load, workout-modified from:body"
         hx-swap="innerHTML"
       >
         get workouts
       </a>
       <div id="workout-target"></div>
-      <a href="/admin">admin</a>
+      <a class="text-lg" href="/admin">admin</a>
+      <p
+        class="text-center"
+        hx-get="/user-info"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+        hx-target="this"
+      ></p>
+      </div>
     </div>
   </body>
 </html>
