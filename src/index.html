@@ -5,49 +5,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="/style.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   </head>
   <body>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
-      <input
-        name="weight"
-        class="weight-input"
-        inputmode="numeric"
-        required="required"
-        pattern="[0-9]{1,20}"
-        type="text"
-      />
-      <label for="weight"> Weight </label>
-      <br />
-      <input
-        name="reps"
-        class="reps-input"
-        inputmode="numeric"
-        required="required"
-        pattern="[0-9]{1,20}"
-        type="text"
-      />
-      <label for="reps"> Reps </label>
-      <br />
-      <input name="note" class="note-input" type="text" />
-      <label for="note"> Note </label>
-      <br />
-      <br />
-      <label for="machine_name">Machine Name</label>
-      <select
-        name="machine_name"
-        hx-get="/machine-list"
-        hx-trigger="load"
+    <div class="container mx-auto p-5">
+      <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
+        <select
+          name="machine_name"
+          hx-get="/machine-list"
+          hx-trigger="load"
+          hx-swap="innerHTML"
+          hx-target="this"
+        ></select>
+        <label for="machine_name">Machine Name</label>
+        <label for="weight">
+          <input
+            name="weight"
+            class="bg-red-200"
+            autocomplete="off"
+            inputmode="numeric"
+            required="required"
+            pattern="[0-9]{1,20}"
+            type="text"
+          />
+          Weight
+        </label>
+        <input
+          name="reps"
+          autocomplete="off"
+          class="bg-green-200"
+          inputmode="numeric"
+          required="required"
+          pattern="[0-9]{1,20}"
+          type="text"
+        />
+        <label for="reps"> Reps </label>
+        <input name="note" autocomplete="off" class="bg-blue-200" type="text" />
+        <label for="note"> Note </label>
+        <button class="btn btn-blue">Submit lift</button>
+      </form>
+      <p id="output"></p>
+      <a
+        href="#"
+        hx-get="/workouts"
+        hx-target="#workout-target"
         hx-swap="innerHTML"
-        hx-target="this"
-      ></select>
-      <button class="btn btn-default">Submit lift</button>
-    </form>
-    <p id="output"></p>
-    <button hx-get="/workouts" hx-target="#workout-target" hx-swap="innerHTML">
-      get workouts
-    </button>
-    <div id="workout-target"></div>
-    <a href="/admin">admin</a>
+      >
+        get workouts
+      </a>
+      <div id="workout-target"></div>
+      <a href="/admin">admin</a>
+    </div>
   </body>
 </html>

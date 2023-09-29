@@ -26,7 +26,6 @@ import {
   initDB,
   getCSV,
   initUser,
-  machineSchema,
 } from "./db.js";
 
 initDB();
@@ -155,7 +154,7 @@ app.post("/new-machine", (req, res) => {
 });
 
 app.get("/style.css", (_, res) => {
-  res.sendFile(__dirname + "/style.css");
+  res.sendFile(join(__dirname, "output.css"));
 });
 
 app.get("/admin", (_, res) => {

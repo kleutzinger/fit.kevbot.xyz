@@ -1,26 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* make background of document black */
 
 /** make everything really big for mobile **/
 
-* {
-  font-size: clamp(1rem, -0.875rem + 8.333vw, 3.5rem);
+@layer base {
+  a {
+    @apply text-blue-900;
+  }
 }
 
-.reps-input,
-.weight-input {
-  width: 70%;
-  padding: 30px 10px;
-  line-height: 40%;
-  text-align: center;
-  outline: 2px solid black;
-  /* put on own line */
-  margin: 0 auto;
+input,
+select {
+  @apply text-center;
+  @apply mb-3;
 }
 
-.reps-input {
-  background-color: #a2f2f2;
+.btn {
+  @apply font-bold py-2 px-4 rounded;
 }
-
-.weight-input {
-  background-color: #f2a2a2;
+.btn-blue {
+  @apply bg-blue-500 text-white;
+}
+.btn-blue:hover {
+  @apply bg-blue-700;
 }

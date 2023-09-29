@@ -131,3 +131,5 @@ dist
 
 db/*
 !db/.gitkeep
+
+src/output.css
