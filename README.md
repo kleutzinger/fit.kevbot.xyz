@@ -16,8 +16,13 @@
   - [ ] display per-machine
 - [x] support multiple users
 - [ ] support decimal parts for weight
+- [x] use templating engine
 - [ ] undo last submit
 - [ ] undo any submit
+- [ ] add kevbadge
+- [ ] add to projects.json
+- [x] private gh repo
+- [ ] public gh repo
 - [x] make it look nicer
 - [ ] edit any field from admin
 - [ ] add column to order machines by
@@ -27,6 +32,7 @@
 - [x] download db
 - [x] remake into single db
 - [x] download db as csv
+- [ ] download json
 - [ ] upload db as csv (advanced)
 - [ ] add tests
 

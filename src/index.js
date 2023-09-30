@@ -1,5 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
+import { join } from "path";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import express from "express";
 import TimeAgo from "javascript-time-ago";
 // English.
@@ -12,10 +16,10 @@ const app = express();
 const port = process.env.PORT || 5000;
 const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
-import { join } from "path";
-import path from "path";
-import { fileURLToPath } from "url";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { engine } from "express-handlebars";
+app.engine(".hbs", engine({ extname: ".hbs" }));
+app.set("view engine", ".hbs");
+app.set("views", join(__dirname, "views"));
 import pkg from "body-parser";
 import {
   getMachineNames,
@@ -64,9 +68,7 @@ app.get("/machine-list", (req, res) => {
 });
 
 app.get("/user-info", (req, res) => {
-  res.send(
-    html`<img class="h-16 w-16 m-5 mx-auto" src=${req.oidc.user.picture}></img><p>${req.oidc.user.email}</p>`,
-  );
+  res.render("user-info", { user: req.oidc.user });
 });
 
 app.get("/download-db", (req, res) => {
@@ -88,36 +90,14 @@ app.get("/download-csv", (req, res) => {
 app.get("/workouts", (req, res) => {
   const { limit } = req.query;
   const user_email = req2email(req);
-  const workouts = getWorkouts(user_email, limit);
-  res.send(
-    html`<table class="table-fixed">
-      <thead>
-        <tr>
-          ${["machine", "weight", "reps", "ago", "note"]
-            .map((header) => {
-              return html`<th scope="col" class="text-lg px-4 py4">
-                ${header}
-              </th>`;
-            })
-            .join("")}
-        </tr>
-      </thead>
-      <tbody>
-        ${workouts
-          .slice(0, 20)
-          .map((workout) => {
-            return html`<tr class="py-4 text-center">
-              <td>${workout.machine_name}</td>
-              <td>${workout.weight}</td>
-              <td>${workout.reps}</td>
-              <td>${timeAgo.format(new Date(workout.datetime), "mini")}</td>
-              <td>${workout.note || ""}</td>
-            </tr>`;
-          })
-          .join("")}
-      </tbody>
-    </table>`,
-  );
+  const workouts = getWorkouts(user_email, limit)
+    .slice(0, limit)
+    .map((workout) => {
+      workout.ago = timeAgo.format(new Date(workout.datetime), "mini");
+      return workout;
+    });
+  const columns = ["machine_name", "weight", "reps", "ago", "note"];
+  res.render("workout-table", { workouts, columns });
 });
 
 app.post("/submit-workout", (req, res) => {
@@ -138,13 +118,6 @@ app.post("/submit-workout", (req, res) => {
     console.error(err);
     res.send(err?.issues);
   }
-});
-
-app.get("/user-info", (req, res) => {
-  const user = req?.oidc?.user;
-  const email = user?.email;
-  const name = user?.name;
-  res.send(html`<p>${email} ${name}</p>`);
 });
 
 app.post("/new-machine", (req, res) => {
