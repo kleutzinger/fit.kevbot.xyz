@@ -72,10 +72,11 @@ function initUser(user_email) {
     "Bicep Curl",
     "Shoulder Press",
     "Stairs",
-  ].map((name) => ({
+  ].map((name, idx) => ({
     name,
     datetime: new Date().toISOString(),
     user_email: user_email,
+    display_order: idx,
   }));
   insertManyMachines(starterMachines);
 }

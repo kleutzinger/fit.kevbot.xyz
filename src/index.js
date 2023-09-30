@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+const NO_AUTH = process.env.NO_AUTH || false;
 import { join } from "path";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -58,7 +59,7 @@ app.use(urlencoded({ extended: true }));
 import { auth } from "express-openid-connect";
 
 const auth0Config = {
-  authRequired: true,
+  authRequired: NO_AUTH ? false : true,
   auth0Logout: true,
   secret: process.env.AUTH_RANDOM_STRING,
   baseURL: base_url,
@@ -70,6 +71,7 @@ const auth0Config = {
 app.use(auth(auth0Config));
 
 function req2email(req) {
+  if (NO_AUTH) return "NOAUTH@fake.com";
   return req?.oidc?.user?.email;
 }
 
@@ -278,7 +280,7 @@ app.get("/admin", (_, res) => {
 });
 
 app.get("/", (req, res) => {
-  initUser(req?.oidc?.user?.email);
+  initUser(req2email(req));
   res.render("index", { user: req.oidc.user });
 });
 

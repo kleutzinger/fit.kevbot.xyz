@@ -6,10 +6,12 @@ https://tracker.kevbot.xyz
 
 ## How to run this project
 
-- You'll have to set up an auth0 app first and set a new `auth0Config` in `src/index.js`
+- `cp .env-example .env`
 - `npm install`
 - `npm run init-db`
 - `npm run dev`
+
+To run in production remove the `NO_AUTH` env var and set up your own `auth0Config` in `src/index.js`
 
 ## Definitions
 
@@ -23,7 +25,7 @@ https://tracker.kevbot.xyz
 - [x] submit a workout
 - [x] add new machines in ui
 - [x] remove machines
-- [ ] add a no-auth env var
+- [x] add a NO_AUTH env var
 - [x] display historical data
   - [ ] display per-machine
 - [x] support multiple users
