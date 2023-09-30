@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "postdeploy": "cd /app && npm run init-db"
+  }
+}

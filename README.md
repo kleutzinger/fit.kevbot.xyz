@@ -17,6 +17,7 @@
 - [x] support multiple users
 - [ ] support decimal parts for weight
 - [x] use templating engine
+- [x] support migrations
 - [ ] undo last submit
 - [ ] undo any submit
 - [ ] add kevbadge

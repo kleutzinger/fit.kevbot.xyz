@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <title>Kevin's workout tracker</title>
+    <meta
+      name="description"
+      content="Kevin's workout tracker. Track your workouts."
+    />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="/style.css" rel="stylesheet" />
@@ -9,17 +13,12 @@
   </head>
   <body>
     <div class="grid grid-cols-1 justify-items-center p-8">
-      <div class="inline-flex items-center justify-center w-full">
-        <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
-        <span
-          class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
-          >log a workout</span
-        >
-      </div>
+      {{> line-break text='top' }}
       <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
         <div>
           <select
             name="machine_name"
+            id="machine_name"
             hx-get="/machine-list"
             hx-trigger="load"
             hx-swap="innerHTML"
@@ -28,31 +27,32 @@
           <label for="machine_name">Machine Name</label>
         </div>
         <div>
-          <label for="weight">
-            <input
-              name="weight"
-              class="bg-red-200"
-              autocomplete="off"
-              inputmode="numeric"
-              pattern="[0-9]{1,20}"
-              type="text"
-            />
-            Weight
-          </label>
+          <input
+            name="weight"
+            id="weight"
+            class="bg-red-200"
+            autocomplete="off"
+            inputmode="numeric"
+            pattern="[0-9]{1,20}"
+            type="text"
+          />
+          <label for="weight">Weight</label>
         </div>
         <div>
           <input
             name="reps"
+            id="reps"
             autocomplete="off"
             class="bg-green-200"
             inputmode="numeric"
             type="text"
           />
-          <label for="reps"> Reps </label>
+          <label for="reps">Reps</label>
         </div>
         <div>
           <input
             name="note"
+            id="note"
             autocomplete="off"
             class="bg-blue-200"
             type="text"
@@ -62,13 +62,7 @@
         <button class="btn btn-blue">Submit lift</button>
       </form>
       <p id="output"></p>
-      <div class="inline-flex items-center justify-center w-full">
-        <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
-        <span
-          class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
-          >admin stuff</span
-        >
-      </div>
+      {{> line-break text='bottom' }}
       <!-- <label for="cur-machine-only">Cur machine only</label> -->
       <!-- <input type="checkbox" id="cur-machine-only" onchange="console.log(this.checked)" /> -->
       <div
@@ -88,21 +82,6 @@
         hx-target="this"
       ></p>
     </div>
-    <script>
-      // https://htmx.org/api/#trigger
-      // reload workouts when the page gets focus
-      let firstFocus = true;
-      addEventListener("focus", (event) => {
-        // prevent double call on page load
-        if (firstFocus) {
-          firstFocus = false;
-          return;
-        }
-        htmx.trigger("#workout-history", "onFocus");
-      });
-      setTimeout(() => {
-        firstFocus = false;
-      }, 10000);
-    </script>
+    <script src="/client.js"></script>
   </body>
 </html>

@@ -17,8 +17,8 @@ const port = process.env.PORT || 5000;
 const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
 import { engine } from "express-handlebars";
-app.engine(".hbs", engine({ extname: ".hbs" }));
-app.set("view engine", ".hbs");
+app.engine(".hbs.html", engine({ extname: ".hbs.html" }));
+app.set("view engine", "hbs.html");
 app.set("views", join(__dirname, "views"));
 import pkg from "body-parser";
 import {
@@ -27,12 +27,10 @@ import {
   addMachineName,
   addWorkout,
   workoutSchema,
-  initDB,
   getCSV,
+  getJSON,
   initUser,
 } from "./db.js";
-
-initDB();
 
 const { urlencoded } = pkg;
 
@@ -85,6 +83,12 @@ app.get("/download-csv", (req, res) => {
     `attachment; filename="${user_email}.csv"`,
   );
   res.send(csvText);
+});
+
+app.get("/download-json", (req, res) => {
+  const user_email = req2email(req);
+  const jsonText = getJSON(user_email);
+  res.json(jsonText);
 });
 
 app.get("/workouts", (req, res) => {
@@ -147,7 +151,7 @@ app.get("/admin", (_, res) => {
 
 app.get("/", (req, res) => {
   initUser(req?.oidc?.user?.email);
-  res.sendFile(__dirname + "/index.html");
+  res.render("index", { user: req.oidc.user });
 });
 
 app.listen(port, () => {

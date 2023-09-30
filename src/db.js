@@ -1,9 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { z } from "zod";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { join } from "path";
+import { existsSync } from "fs";
 import Database from "better-sqlite3";
 import { Parser } from "@json2csv/plainjs";
+
 const DB_DIR = process.env.DB_DIR || "./db";
 const DB_NAME = process.env.DB_NAME || "db.sqlite";
 const DB_PATH = join(DB_DIR, DB_NAME);
@@ -33,20 +38,6 @@ const userSchema = z.object({
   note: z.string().optional(),
   datetime: z.coerce.string().datetime(),
 });
-
-function initDB() {
-  const workoutTableDef =
-    "CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, machine_name TEXT, weight INTEGER, reps INTEGER, datetime TEXT, note TEXT, user_email TEXT)";
-
-  db.exec(workoutTableDef);
-  const knownMachinesDef =
-    "CREATE TABLE IF NOT EXISTS machines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, datetime TEXT, note TEXT, user_email TEXT);";
-  db.exec(knownMachinesDef);
-
-  const userTableDef =
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, note TEXT, datetime TEXT);";
-  db.exec(userTableDef);
-}
 
 function initUser(user_email) {
   if (!user_email) throw new Error("user_email is required");
@@ -154,10 +145,27 @@ function getCSV(user_email) {
   }
 }
 
+//** returns a JSON string of all your workouts */
+function getJSON(user_email) {
+  try {
+    const workouts = getWorkouts(user_email);
+    const fieldsToRemove = ["id", "user_email"];
+    for (const workout of workouts) {
+      for (const field of fieldsToRemove) {
+        delete workout[field];
+      }
+    }
+    return workouts;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export {
-  initDB,
   initUser,
   getCSV,
+  getJSON,
+  db,
   insertManyWorkouts,
   addWorkout,
   getMachineNames,
