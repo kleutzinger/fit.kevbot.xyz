@@ -73,13 +73,14 @@
         hx-trigger="workout-modified from:body, onFocus, load"
         hx-swap="innerHTML"
       ></div>
-      <a class="text-lg" href="/admin">admin</a>
+      <a class="text-xl" href="/admin">admin</a>
+      <a class="text-xl" href="/edit-machines">edit saved machines</a>
+      <a class="text-xl" href="/edit-workouts">edit workout logs</a>
       <p
         class="text-center"
         hx-get="/user-info"
         hx-trigger="load"
         hx-swap="innerHTML"
-        hx-target="this"
       ></p>
     </div>
     <script src="/client.js"></script>

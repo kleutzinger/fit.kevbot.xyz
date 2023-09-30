@@ -37,6 +37,8 @@ import pkg from "body-parser";
 import {
   getMachineNames,
   getWorkouts,
+  getMachines,
+  deleteMachine,
   addMachineName,
   addWorkout,
   workoutSchema,
@@ -163,6 +165,10 @@ app.post("/update-workout", (req, res) => {
   res.send("not yet implemented..... " + JSON.stringify(req.body));
 });
 
+app.post("/update-machine", (req, res) => {
+  res.send("not yet implemented..... " + JSON.stringify(req.body));
+});
+
 app.post("/delete-workout", (req, res, next) => {
   try {
     const user_email = req2email(req);
@@ -174,13 +180,60 @@ app.post("/delete-workout", (req, res, next) => {
   }
 });
 
-app.get("/edit", (req, res) => {
+app.post("/delete-machine", (req, res, next) => {
+  try {
+    const user_email = req2email(req);
+    const machine_id = req?.query?.id;
+    const serverResp = deleteMachine(machine_id, user_email);
+    res.send(serverResp);
+  } catch (err) {
+    res.status(400).send("bad delete");
+  }
+});
+
+app.get("/edit-workouts", (req, res) => {
   const user_email = req2email(req);
-  const columns = ["id", "machine_name", "weight", "reps", "datetime", "note"];
+  const columns = [
+    "id",
+    "machine_name",
+    "weight",
+    "reps",
+    "datetime",
+    "note",
+  ].map((i) => {
+    const out = {};
+    if (i == "id") {
+      out.visibility = "readonly";
+    } else out.visibility = "editable";
+    out.key = i;
+    return out;
+  });
   res.render("edit-page", {
     layout: "full-page",
     user: req.oidc.user,
-    workouts: getWorkouts(user_email),
+    items: getWorkouts(user_email),
+    endpoint: "workout",
+    columns,
+  });
+});
+
+app.get("/edit-machines", (req, res) => {
+  const user_email = req2email(req);
+  const columns = ["id", "name", "datetime", "note", "display_order"].map(
+    (i) => {
+      const out = {};
+      if (i == "id") {
+        out.visibility = "readonly";
+      } else out.visibility = "editable";
+      out.key = i;
+      return out;
+    },
+  );
+  res.render("edit-page", {
+    layout: "full-page",
+    user: req.oidc.user,
+    items: getMachines(user_email),
+    endpoint: "machine",
     columns,
   });
 });

@@ -1,34 +1,34 @@
-{{#with user}}
-<p>{{name}} {{email}}</p>
-{{/with}}
+<a href="/">go back</a>
+<div hx-trigger="load" hx-get="/user-info" hx-swap="innerHTML"></div>
 <p id="output"></p>
-{{#each columns}} {{this}} {{/each}}
+<h1>EDIT {{endpoint}}</h1>
+{{#each columns}} {{this.key}} {{/each}}
 <div>
-  {{#each workouts as |workout|}}
+  {{#each items as |item|}}
   <form
-    id="form-{{workout.id}}"
-    hx-post="/update-workout"
+    id="form-{{item.id}}"
+    hx-post="/update-{{../endpoint}}"
     hx-target="#output"
     hx-swap="innerHTML"
   >
     {{#each ../columns as |column|}}
     <input
       type="text"
-      {{#ifeq column "id"}} readonly {{/ifeq}}
-      id="{{column}}"
-      name="{{column}}"
-      value="{{lookup workout column}}"
+      {{#ifeq column.visibility "readonly"}} readonly {{/ifeq}}
+      id="{{column.key}}"
+      name="{{column.key}}"
+      value="{{lookup item column.key}}"
     />
     {{/each}}
-    <button>submit</button>
+    <button>submit update</button>
   </form>
   <button
     class="inline-flex"
-    hx-post="/delete-workout?id={{workout.id}}"
+    hx-post="/delete-{{../endpoint}}?id={{item.id}}"
     hx-swap="outerHTML"
-    hx-target="#form-{{workout.id}}"
+    hx-target="#form-{{item.id}}"
   >
-    delete {{workout.id}}
+    delete {{item.id}}
   </button>
   {{/each}}
 </div>

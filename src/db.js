@@ -122,6 +122,14 @@ const getWorkouts = (user_email, limit) => {
     .all(user_email, limit || 10000);
 };
 
+const getMachines = (user_email, limit) => {
+  return db
+    .prepare(
+      "SELECT * FROM machines WHERE user_email = ? ORDER BY datetime DESC LIMIT ?",
+    )
+    .all(user_email, limit || 10000);
+};
+
 const addMachineName = (machine_name, user_email) => {
   // get machine with largest display_order
   const maybeMachine = db
@@ -194,6 +202,16 @@ function deleteWorkout(id, user_email) {
   return "success";
 }
 
+function deleteMachine(id, user_email) {
+  const out = db
+    .prepare("DELETE FROM machines WHERE id = ? AND user_email = ?")
+    .run(id, user_email);
+  if (out.changes === 0) {
+    throw new Error("No machine found with that id and email");
+  }
+  return "success";
+}
+
 export {
   initUser,
   getCSV,
@@ -203,6 +221,8 @@ export {
   insertManyWorkouts,
   addWorkout,
   getMachineNames,
+  getMachines,
+  deleteMachine,
   addMachineName,
   getWorkouts,
   workoutSchema,
