@@ -17,7 +17,20 @@ const port = process.env.PORT || 5000;
 const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
 import { engine } from "express-handlebars";
-app.engine(".hbs.html", engine({ extname: ".hbs.html" }));
+app.engine(
+  ".hbs.html",
+  engine({
+    extname: ".hbs.html",
+    helpers: {
+      ifeq: function (a, b, options) {
+        if (a === b) {
+          return options.fn(this);
+        }
+        return options.inverse(this);
+      },
+    },
+  }),
+);
 app.set("view engine", "hbs.html");
 app.set("views", join(__dirname, "views"));
 import pkg from "body-parser";
@@ -27,6 +40,7 @@ import {
   addMachineName,
   addWorkout,
   workoutSchema,
+  deleteWorkout,
   getCSV,
   getJSON,
   initUser,
@@ -143,6 +157,32 @@ app.post("/new-machine", (req, res) => {
 
 app.get("/style.css", (_, res) => {
   res.sendFile(join(__dirname, "output.css"));
+});
+
+app.post("/update-workout", (req, res) => {
+  res.send("not yet implemented..... " + JSON.stringify(req.body));
+});
+
+app.post("/delete-workout", (req, res, next) => {
+  try {
+    const user_email = req2email(req);
+    const workout_id = req?.query?.id;
+    const serverResp = deleteWorkout(workout_id, user_email);
+    res.send(serverResp);
+  } catch (err) {
+    res.status(400).send("bad delete");
+  }
+});
+
+app.get("/edit", (req, res) => {
+  const user_email = req2email(req);
+  const columns = ["id", "machine_name", "weight", "reps", "datetime", "note"];
+  res.render("edit-page", {
+    layout: "full-page",
+    user: req.oidc.user,
+    workouts: getWorkouts(user_email),
+    columns,
+  });
 });
 
 app.get("/admin", (_, res) => {

@@ -184,11 +184,22 @@ function getJSON(user_email) {
   }
 }
 
+function deleteWorkout(id, user_email) {
+  const out = db
+    .prepare("DELETE FROM workouts WHERE id = ? AND user_email = ?")
+    .run(id, user_email);
+  if (out.changes === 0) {
+    throw new Error("No workout found with that id and email");
+  }
+  return "success";
+}
+
 export {
   initUser,
   getCSV,
   getJSON,
   db,
+  deleteWorkout,
   insertManyWorkouts,
   addWorkout,
   getMachineNames,

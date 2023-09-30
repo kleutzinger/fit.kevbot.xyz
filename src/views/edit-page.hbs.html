@@ -1,0 +1,34 @@
+{{#with user}}
+<p>{{name}} {{email}}</p>
+{{/with}}
+<p id="output"></p>
+{{#each columns}} {{this}} {{/each}}
+<div>
+  {{#each workouts as |workout|}}
+  <form
+    id="form-{{workout.id}}"
+    hx-post="/update-workout"
+    hx-target="#output"
+    hx-swap="innerHTML"
+  >
+    {{#each ../columns as |column|}}
+    <input
+      type="text"
+      {{#ifeq column "id"}} readonly {{/ifeq}}
+      id="{{column}}"
+      name="{{column}}"
+      value="{{lookup workout column}}"
+    />
+    {{/each}}
+    <button>submit</button>
+  </form>
+  <button
+    class="inline-flex"
+    hx-post="/delete-workout?id={{workout.id}}"
+    hx-swap="outerHTML"
+    hx-target="#form-{{workout.id}}"
+  >
+    delete {{workout.id}}
+  </button>
+  {{/each}}
+</div>

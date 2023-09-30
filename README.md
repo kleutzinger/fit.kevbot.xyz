@@ -19,21 +19,25 @@
 - [x] use templating engine
 - [x] support migrations
 - [ ] undo last submit
-- [ ] undo any submit
+- [x] undo any submit
 - [ ] add kevbadge
 - [ ] add to projects.json
 - [x] private gh repo
 - [ ] public gh repo
 - [x] make it look nicer
 - [ ] edit any field from admin
-- [ ] add column to order machines by
+- [x] add column to order machines by
 - [x] auto update workout history onsubmit
 - [ ] optionally only show current machine's history
-- [ ] delete rows from db
+- [x] delete workouts from db
 - [x] download db
 - [x] remake into single db
 - [x] download db as csv
-- [ ] download json
+- [x] download json
+- [ ] !!!! collapse the edit page to also edit machines !!!! (or user!)
+  - [ ] column.value / column.visibility: readonly, hidden, editable
+  - [ ] items: \[dbobj...\]
+  - [ ] endpoint: str
 - [ ] upload db as csv (advanced)
 - [ ] add tests
 
