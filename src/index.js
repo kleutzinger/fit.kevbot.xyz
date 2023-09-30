@@ -44,6 +44,8 @@ import {
   workoutSchema,
   deleteWorkout,
   getCSV,
+  updateDBItem,
+  machineSchema,
   getJSON,
   initUser,
 } from "./db.js";
@@ -162,11 +164,33 @@ app.get("/style.css", (_, res) => {
 });
 
 app.post("/update-workout", (req, res) => {
-  res.send("not yet implemented..... " + JSON.stringify(req.body));
+  try {
+    const user_email = req2email(req);
+    const workout_id = req.body.id;
+    req.body.user_email = user_email;
+    const newWorkout = workoutSchema.parse(req.body);
+    newWorkout.id = workout_id;
+    const serverResp = updateDBItem("workouts", newWorkout);
+    res.send(serverResp);
+  } catch (err) {
+    console.error(err);
+    res.send(err?.issues || err.message);
+  }
 });
 
 app.post("/update-machine", (req, res) => {
-  res.send("not yet implemented..... " + JSON.stringify(req.body));
+  try {
+    const user_email = req2email(req);
+    const machine_id = req.body.id;
+    req.body.user_email = user_email;
+    const newMachine = machineSchema.parse(req.body);
+    newMachine.id = machine_id;
+    const serverResp = updateDBItem("machines", newMachine);
+    res.send(serverResp);
+  } catch (err) {
+    console.error(err);
+    res.send(err?.issues || err.message);
+  }
 });
 
 app.post("/delete-workout", (req, res, next) => {

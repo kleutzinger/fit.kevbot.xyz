@@ -34,10 +34,14 @@
 - [x] remake into single db
 - [x] download db as csv
 - [x] download json
-- [ ] !!!! collapse the edit page to also edit machines !!!! (or user!)
-  - [ ] column.value / column.visibility: readonly, hidden, editable
-  - [ ] items: \[dbobj...\]
-  - [ ] endpoint: str
+- [x] !!!! collapse the edit page to also edit machines !!!! (or user!)
+  - [x] column.key / column.visibility: readonly, hidden, editable
+  - [x] items: \[dbobj...\]
+  - [x] endpoint: str
+  - [x] allow updates
+  - [x] single updateDBItem
+  - [ ] single deleteDBItem
+  - [ ] single addDBItem?
 - [ ] upload db as csv (advanced)
 - [ ] add tests
 

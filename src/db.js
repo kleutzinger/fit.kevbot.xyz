@@ -32,7 +32,7 @@ const machineSchema = z.object({
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
   user_email: z.string(),
-  display_order: z.number().int(),
+  display_order: z.coerce.number().int(),
 });
 
 const userSchema = z.object({
@@ -212,6 +212,23 @@ function deleteMachine(id, user_email) {
   return "success";
 }
 
+function updateDBItem(tableName, allFields) {
+  const { id, user_email, ...fields } = allFields;
+  const out = db
+    .prepare(
+      `UPDATE ${tableName} SET ${Object.keys(fields)
+        .map((key) => `${key} = @${key}`)
+        .join(", ")} WHERE id = @id AND user_email = @user_email`,
+    )
+    .run(allFields);
+  if (out.changes === 0) {
+    throw new Error(
+      `No ${tableName} found with  ${JSON.stringify({ id, user_email })}`,
+    );
+  }
+  return `updated ${tableName}: ${JSON.stringify(fields)}`;
+}
+
 export {
   initUser,
   getCSV,
@@ -223,6 +240,7 @@ export {
   getMachineNames,
   getMachines,
   deleteMachine,
+  updateDBItem,
   addMachineName,
   getWorkouts,
   workoutSchema,
