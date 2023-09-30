@@ -29,13 +29,13 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] display historical data
   - [ ] display per-machine
 - [x] support multiple users
-- [ ] support decimal parts for weight
+- [x] support decimal parts for all numeric fields
 - [x] use templating engine
 - [x] support migrations
 - [ ] undo last submit
 - [x] undo any submit
-- [ ] add kevbadge
-- [ ] add to projects.json
+- [x] add kevbadge
+- [x] add to projects.json
 - [x] private gh repo
 - [x] public gh repo
 - [x] make it look nicer

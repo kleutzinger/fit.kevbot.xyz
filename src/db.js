@@ -20,11 +20,11 @@ db.pragma("journal_mode = WAL");
 
 const workoutSchema = z.object({
   machine_name: z.string(),
-  weight: z.coerce.number().int(),
-  reps: z.coerce.number().int(),
+  weight: z.coerce.number(),
+  reps: z.coerce.number(),
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
-  duration: z.coerce.number().int(),
+  duration: z.coerce.number(),
   user_email: z.string(),
 });
 
