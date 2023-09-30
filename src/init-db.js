@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+const MIG_NUM = process.env.MIG_NUM || null;
 import { map } from "extra-promise";
 import { findMigrationFilenames, readMigrationFile } from "migration-files";
 import { migrate } from "@blackglory/better-sqlite3-migrations";
@@ -12,7 +13,11 @@ async function initDB() {
   console.log("initializing database " + db.name);
   const filenames = await findMigrationFilenames(join(__dirname, "migrations"));
   const migrations = await map(filenames, readMigrationFile);
-  migrate(db, migrations);
+  if (MIG_NUM !== null) {
+    migrate(db, migrations, parseInt(MIG_NUM));
+  } else {
+    migrate(db, migrations);
+  }
   console.log("database initialized at " + db.name);
 }
 

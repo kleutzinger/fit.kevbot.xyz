@@ -13,7 +13,8 @@ const DB_DIR = process.env.DB_DIR || "./db";
 const DB_NAME = process.env.DB_NAME || "db.sqlite";
 const DB_PATH = join(DB_DIR, DB_NAME);
 // verbose if in dev
-const verbose = process.env.NODE_ENV === "development" ? console.log : null;
+// const verbose = process.env.NODE_ENV === "development" ? console.log : null;
+const verbose = console.log;
 const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 
@@ -31,6 +32,7 @@ const machineSchema = z.object({
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
   user_email: z.string(),
+  display_order: z.number().int(),
 });
 
 const userSchema = z.object({
@@ -79,7 +81,7 @@ function initUser(user_email) {
 
 const insertManyMachines = (machines) => {
   const insert = db.prepare(
-    "INSERT OR IGNORE INTO machines (name, datetime, user_email) VALUES (@name, @datetime, @user_email)",
+    "INSERT OR IGNORE INTO machines (name, datetime, user_email, display_order) VALUES (@name, @datetime, @user_email, @display_order)",
   );
   for (const machine of machines) {
     insert.run(machine);
@@ -105,9 +107,11 @@ const addWorkout = (workout) => {
 
 const getMachineNames = (user_email) => {
   return db
-    .prepare("SELECT * FROM machines WHERE user_email = ?")
+    .prepare(
+      "SELECT * FROM machines WHERE user_email = ? ORDER BY display_order",
+    )
     .all(user_email)
-    .map((x) => x.name);
+    .map((x) => `${x.name}`);
 };
 
 const getWorkouts = (user_email, limit) => {
@@ -119,10 +123,18 @@ const getWorkouts = (user_email, limit) => {
 };
 
 const addMachineName = (machine_name, user_email) => {
+  // get machine with largest display_order
+  const maybeMachine = db
+    .prepare(
+      "SELECT * FROM machines WHERE user_email = ? ORDER BY display_order DESC LIMIT 1",
+    )
+    .get(user_email);
+  const display_order = maybeMachine ? maybeMachine.display_order + 1 : 0;
   const obj = {
     name: machine_name,
     datetime: new Date().toISOString(),
     user_email: user_email,
+    display_order: display_order,
   };
   insertManyMachines([obj]);
   return obj;
@@ -155,7 +167,18 @@ function getJSON(user_email) {
         delete workout[field];
       }
     }
-    return workouts;
+    const machines = db
+      .prepare(
+        "SELECT * FROM machines WHERE user_email = ? ORDER BY datetime DESC",
+      )
+      .all(user_email)
+      .map((x) => {
+        delete x.id;
+        delete x.user_email;
+        return x;
+      });
+
+    return { workouts, machines };
   } catch (err) {
     console.error(err);
   }
