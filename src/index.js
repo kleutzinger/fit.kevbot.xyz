@@ -57,7 +57,7 @@ app.use(urlencoded({ extended: true }));
 
 import { auth } from "express-openid-connect";
 
-const config = {
+const auth0Config = {
   authRequired: true,
   auth0Logout: true,
   secret: process.env.AUTH_RANDOM_STRING,
@@ -67,7 +67,7 @@ const config = {
 };
 
 // auth router attaches /login, /logout, and /callback routes to the baseURL
-app.use(auth(config));
+app.use(auth(auth0Config));
 
 function req2email(req) {
   return req?.oidc?.user?.email;
@@ -118,7 +118,7 @@ app.get("/workouts", (req, res) => {
       workout.ago = timeAgo.format(new Date(workout.datetime), "mini");
       return workout;
     });
-  const columns = ["machine_name", "weight", "reps", "ago", "note"];
+  const columns = ["machine_name", "weight", "reps", "ago", "duration", "note"];
   res.render("workout-table", { workouts, columns });
 });
 
@@ -126,11 +126,20 @@ app.post("/submit-workout", (req, res) => {
   const user_email = req2email(req);
   req.body.datetime = new Date().toISOString();
   req.body.user_email = user_email;
+  const hms2sec = (hms) => {
+    const [h, m, s] = hms.split(":").map((x) => parseInt(x));
+    return parseInt(h * 3600 + m * 60 + s);
+  };
+  req.body.duration = hms2sec(req.body.duration);
   let submitObj = {};
   try {
     submitObj = workoutSchema.parse(req.body);
-    // check no note, weight=0, reps=0
-    if (!submitObj.note && !submitObj.weight && !submitObj.reps) {
+    if (
+      !submitObj.note &&
+      !submitObj.weight &&
+      !submitObj.reps &&
+      !submitObj.duration
+    ) {
       return res.send("Please fill out at least one field");
     }
     const serverResp = addWorkout(submitObj);
@@ -223,12 +232,13 @@ app.get("/edit-workouts", (req, res) => {
     "weight",
     "reps",
     "datetime",
+    "duration",
     "note",
   ].map((i) => {
     const out = {};
     if (i == "id") {
-      out.visibility = "readonly";
-    } else out.visibility = "editable";
+      out.readonly = "readonly";
+    } else out.readonly = "";
     out.key = i;
     return out;
   });
@@ -247,8 +257,9 @@ app.get("/edit-machines", (req, res) => {
     (i) => {
       const out = {};
       if (i == "id") {
-        out.visibility = "readonly";
-      } else out.visibility = "editable";
+        out.readonly = "readonly";
+      } else out.readonly = "";
+
       out.key = i;
       return out;
     },

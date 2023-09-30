@@ -15,7 +15,7 @@
     {{#each ../columns as |column|}}
     <input
       type="text"
-      {{#ifeq column.visibility "readonly"}} readonly {{/ifeq}}
+      {{column.readonly}}
       id="{{column.key}}"
       name="{{column.key}}"
       autocomplete="off"

@@ -1,5 +1,16 @@
 # goal: track my workouts from my phone in the gym
 
+## Website is live at
+
+https://tracker.kevbot.xyz
+
+## How to run this project
+
+- You'll have to set up an auth0 app first and set a new `auth0Config` in `src/index.js`
+- `npm install`
+- `npm run init-db`
+- `npm run dev`
+
 ## Definitions
 
 - Machine: what exercise/activity you are doing (eg: bicep curl, lat pulldown, pushup?)
@@ -11,7 +22,8 @@
 - [x] push data to sqlite ~or google sheet~
 - [x] submit a workout
 - [x] add new machines in ui
-- [ ] remove machines
+- [x] remove machines
+- [ ] add a no-auth env var
 - [x] display historical data
   - [ ] display per-machine
 - [x] support multiple users
@@ -23,9 +35,9 @@
 - [ ] add kevbadge
 - [ ] add to projects.json
 - [x] private gh repo
-- [ ] public gh repo
+- [x] public gh repo
 - [x] make it look nicer
-- [ ] edit any field from admin
+- [x] edit any field from edit page
 - [x] add column to order machines by
 - [x] auto update workout history onsubmit
 - [ ] optionally only show current machine's history
@@ -42,8 +54,10 @@
   - [x] single updateDBItem
   - [ ] single deleteDBItem
   - [ ] single addDBItem?
+- [ ] displayName for columns in UI
 - [ ] upload db as csv (advanced)
 - [ ] add tests
+- [ ] start actually using it in the gym
 
 ## Rough UI
 

@@ -24,6 +24,7 @@ const workoutSchema = z.object({
   reps: z.coerce.number().int(),
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
+  duration: z.coerce.number().int(),
   user_email: z.string(),
 });
 
@@ -89,10 +90,12 @@ const insertManyMachines = (machines) => {
 };
 
 const insertManyWorkouts = (workouts) => {
-  for (const workout of workouts)
+  for (const workout of workouts) {
+    console.table(workout);
     db.prepare(
-      "INSERT INTO workouts (machine_name, weight, reps, datetime, user_email, note) VALUES (@machine_name, @weight, @reps, @datetime, @user_email, @note)",
+      "INSERT INTO workouts (machine_name, weight, reps, datetime, user_email, note, duration) VALUES (@machine_name, @weight, @reps, @datetime, @user_email, @note, @duration)",
     ).run(workout);
+  }
 };
 
 const addWorkout = (workout) => {

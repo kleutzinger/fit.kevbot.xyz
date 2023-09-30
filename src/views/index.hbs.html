@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="/style.css" rel="stylesheet" />
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-duration-picker@latest/dist/html-duration-picker.min.js"></script>
   </head>
   <body>
     <div class="grid grid-cols-1 justify-items-center p-8">
@@ -24,7 +25,7 @@
             hx-swap="innerHTML"
             hx-target="this"
           ></select>
-          <label for="machine_name">Machine Name</label>
+          <label for="machine_name">Exercise Name</label>
         </div>
         <div>
           <input
@@ -36,7 +37,7 @@
             pattern="[0-9]{1,20}"
             type="text"
           />
-          <label for="weight">Weight</label>
+          <label for="weight">Weight/Watts</label>
         </div>
         <div>
           <input
@@ -57,9 +58,20 @@
             class="bg-blue-200"
             type="text"
           />
-          <label for="note"> Note </label>
+          <label for="note">Note</label>
         </div>
-        <button class="btn btn-blue">Submit lift</button>
+        <div>
+          <input
+            name="duration"
+            id="duration"
+            autocomplete="off"
+            class="bg-purple-200 html-duration-picker"
+          />
+          <label for="duration">Duration</label>
+        </div>
+        <div>
+          <button class="mt-5 btn btn-blue">Submit new exercise log</button>
+        </div>
       </form>
       <p id="output"></p>
       {{> line-break text='bottom' }}
@@ -84,5 +96,17 @@
       ></p>
     </div>
     <script src="/client.js"></script>
+    <script type="text/javascript">
+      (function () {
+        const cdn_script_url =
+          "https://cdn.jsdelivr.net/npm/kevbadge/kevbadge.js";
+        let kevbadge = document.createElement("script");
+        kevbadge.type = "text/javascript";
+        kevbadge.async = true;
+        kevbadge.src = cdn_script_url;
+        let s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(kevbadge, s);
+      })();
+    </script>
   </body>
 </html>
