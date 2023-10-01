@@ -1,5 +1,7 @@
+<link href="/style.css" rel="stylesheet" />
+<script src="/client.js"></script>
 <div class="grid grid-cols-1 justify-items-center p-8">
-  {{> line-break text='top' }}
+  {{> line-break text='*' }}
   <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
     <div>
       <select
@@ -79,7 +81,7 @@
     </div>
   </form>
   <p id="output"></p>
-  {{> line-break text='bottom' }}
+  {{> line-break text='*' }}
   <div
     href="#"
     class="text-xl"
@@ -95,4 +97,3 @@
     hx-swap="innerHTML"
   ></p>
 </div>
-<script src="/client.js"></script>
