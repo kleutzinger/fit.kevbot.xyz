@@ -13,13 +13,15 @@
   >
     {{#each ../columns as |column|}}
     <input
-      type="text"
+      type="{{column.input_type}}"
       {{column.readonly}}
       id="{{column.key}}"
       name="{{column.key}}"
       autocomplete="off"
       value="{{lookup item column.key}}"
     />
+    <label for="{{column.key}}">{{column.key}}</label>
+    <br />
     {{/each}}
     <button>submit update</button>
   </form>

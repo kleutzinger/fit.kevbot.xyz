@@ -1,0 +1,108 @@
+{{#with machine}}
+<form
+  hx-post="/submit-workout"
+  hx-swap="innerHTML"
+  hx-target="#output"
+  hx-params="not machine_name"
+>
+  <div>
+    <p class="text-3xl">{{name}}</p>
+    <input name="machine_id" id="machine_id" readonly hidden value="{{id}}" />
+  </div>
+  <div>
+    {{#if weight_active}}
+    <input
+      name="weight"
+      id="weight"
+      class="bg-red-200"
+      autocomplete="off"
+      inputmode="numeric"
+      type="text"
+    />
+    <label for="weight">Weight</label>
+    {{/if}}
+  </div>
+  {{#if watts_active}}
+  <div>
+    <input
+      name="watts"
+      id="watts"
+      class="bg-red-200"
+      autocomplete="off"
+      inputmode="numeric"
+      type="text"
+    />
+    <label for="watts">Watts</label>
+  </div>
+  {{/if}} {{#if reps_active}}
+  <div>
+    <input
+      name="reps"
+      id="reps"
+      autocomplete="off"
+      class="bg-green-200"
+      inputmode="numeric"
+      type="text"
+    />
+    <label for="reps">Reps</label>
+  </div>
+  {{/if}} {{#if distance_active}}
+  <div>
+    <input
+      name="distance"
+      id="distance"
+      autocomplete="off"
+      class="bg-green-200"
+      inputmode="numeric"
+      type="text"
+    />
+    <label for="distance">Distance</label>
+    <div>
+      {{/if}} {{#if duration_active}}
+      <div>
+        <p>Duration (H:M:S):</p>
+        <input
+          name="duration_h"
+          id="duration_h"
+          autocomplete="off"
+          inputmode="numeric"
+          placeholder="0"
+          class="bg-purple-200 w-20"
+        />
+        <label for="duration">:</label>
+        <input
+          name="duration_m"
+          id="duration_m"
+          autocomplete="off"
+          inputmode="numeric"
+          placeholder="0"
+          class="bg-purple-200 w-20"
+        />
+        <label for="duration">:</label>
+        <input
+          name="duration_s"
+          id="duration_s"
+          autocomplete="off"
+          inputmode="numeric"
+          placeholder="0"
+          class="bg-purple-200 w-20"
+        />
+        <label for="duration_m">Sec</label>
+      </div>
+
+      {{/if}}
+      <input
+        name="note"
+        id="note"
+        autocomplete="off"
+        class="bg-blue-200"
+        type="text"
+      />
+      <label for="note">Note</label>
+    </div>
+    <div>
+      <button class="mt-5 btn btn-blue">Submit new exercise log</button>
+    </div>
+  </div>
+</form>
+{{/with}}

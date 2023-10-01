@@ -39,7 +39,8 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] private gh repo
 - [x] public gh repo
 - [x] make it look nicer
-- [x] edit any field from edit page
+- [ ] edit any field from edit page !!!! (I broke the machine editing page)
+- [ ] explain why can't delete machine when workouts still present
 - [x] add column to order machines by
 - [x] auto update workout history onsubmit
 - [ ] optionally only show current machine's history
@@ -60,6 +61,14 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] upload db as csv (advanced)
 - [ ] add tests
 - [ ] start actually using it in the gym
+- [x] machine_id foreign key in workouts
+- [ ] weight units in db (as text on machines)
+- [ ] distance units (as text on machines)
+- [ ] fix "machine" language on display
+- [ ] show machine_name properly throughout !!!!
+- [ ] start actually using it in the gym
+- [ ] select machine in main page !!!!
+- [x] navbar
 
 ## Rough UI
 
@@ -85,3 +94,9 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 │                                │
 └────────────────────────────────┘
 ```
+
+## Learnings
+
+- I should try to use drizzle next time
+- CRUD is always(?) annoying
+- sqlite works nicely

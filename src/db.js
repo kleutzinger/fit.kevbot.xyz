@@ -19,24 +19,34 @@ const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 
 const workoutSchema = z.object({
-  machine_name: z.string(),
-  weight: z.coerce.number(),
-  reps: z.coerce.number(),
+  id: z.coerce.number().int().optional(),
+  weight: z.coerce.number().default(0),
+  reps: z.coerce.number().default(0),
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
-  duration: z.coerce.number(),
+  duration: z.coerce.number().default(0),
+  distance: z.coerce.number().default(0),
+  watts: z.coerce.number().default(0),
   user_email: z.string(),
+  machine_id: z.coerce.number().int(),
 });
 
 const machineSchema = z.object({
+  id: z.coerce.number().int().optional(),
   name: z.string(),
   datetime: z.coerce.string().datetime(),
   note: z.string().optional(),
   user_email: z.string(),
-  display_order: z.coerce.number().int(),
+  display_order: z.coerce.number().int().default(0),
+  distance_active: z.coerce.number().int().default(0),
+  weight_active: z.coerce.number().int().default(0),
+  duration_active: z.coerce.number().int().default(0),
+  reps_active: z.coerce.number().int().default(0),
+  watts_active: z.coerce.number().int().default(0),
 });
 
 const userSchema = z.object({
+  id: z.coerce.number().int().optional(),
   email: z.string().email(),
   note: z.string().optional(),
   datetime: z.coerce.string().datetime(),
@@ -61,30 +71,43 @@ function initUser(user_email) {
 
   // insert default machines
   const starterMachines = [
-    "Tricep Extension",
-    "Leg Extension",
-    "Chest Press",
-    "Lat Pulldown",
-    "Seated Rows",
-    "Leg Lift",
-    "Pec Fly",
-    "Pec Fly (Reverse)",
-    "Bicep Curl",
-    "Shoulder Press",
-    "Stairs",
-  ].map((name, idx) => ({
-    name,
-    datetime: new Date().toISOString(),
-    user_email: user_email,
-    display_order: idx,
-  }));
+    { name: "Bench Press", weight_active: true, reps_active: true },
+    { name: "Running", distance_active: true, duration_active: true },
+    {
+      name: "Rowing Machine",
+      watts_active: true,
+      duration_active: true,
+      distance_active: true,
+    },
+    {
+      name: "Biking",
+      watts_active: true,
+      duration_active: true,
+      distance_active: true,
+    },
+  ].map((vals, idx) => {
+    const toInsert = machineSchema.parse({
+      datetime: new Date().toISOString(),
+      user_email: user_email,
+      display_order: idx,
+      ...vals,
+    });
+    console.table(toInsert);
+    return toInsert;
+  });
   insertManyMachines(starterMachines);
 }
 
 const insertManyMachines = (machines) => {
   const insert = db.prepare(
-    "INSERT OR IGNORE INTO machines (name, datetime, user_email, display_order) VALUES (@name, @datetime, @user_email, @display_order)",
+    `INSERT INTO machines
+          (name, datetime, user_email, display_order,
+           distance_active, weight_active, duration_active, reps_active, watts_active)
+    VALUES (@name, @datetime, @user_email, @display_order,
+            @distance_active, @weight_active, @duration_active, @reps_active, @watts_active)
+    `,
   );
+
   for (const machine of machines) {
     insert.run(machine);
   }
@@ -94,7 +117,12 @@ const insertManyWorkouts = (workouts) => {
   for (const workout of workouts) {
     console.table(workout);
     db.prepare(
-      "INSERT INTO workouts (machine_name, weight, reps, datetime, user_email, note, duration) VALUES (@machine_name, @weight, @reps, @datetime, @user_email, @note, @duration)",
+      `INSERT INTO workouts
+        (weight, reps, datetime, user_email, note, 
+         duration, distance, watts, machine_id)
+      VALUES
+        (@weight, @reps, @datetime, @user_email, @note,
+          @duration, @distance, @watts, @machine_id)`,
     ).run(workout);
   }
 };

@@ -148,7 +148,9 @@ app.post("/submit-workout", (req, res) => {
       !submitObj.note &&
       !submitObj.weight &&
       !submitObj.reps &&
-      !submitObj.duration
+      !submitObj.duration &&
+      !submitObj.distance &&
+      !submitObj.watts
     ) {
       return res.send("Please fill out at least one field");
     }
@@ -213,29 +215,33 @@ app.post("/update-machine", (req, res) => {
   }
 });
 
-app.post("/delete-workout", (req, res, next) => {
+app.post("/delete-workout", (req, res) => {
   try {
     const user_email = req2email(req);
     const workout_id = req?.query?.id;
     const serverResp = deleteWorkout(workout_id, user_email);
     res.send(serverResp);
   } catch (err) {
-    res.status(400).send("bad delete");
+    console.error(err);
+    res.status(400).send(JSON.stringify(err));
   }
 });
 
-app.post("/delete-machine", (req, res, next) => {
+app.post("/delete-machine", (req, res) => {
   try {
     const user_email = req2email(req);
     const machine_id = req?.query?.id;
     const serverResp = deleteMachine(machine_id, user_email);
     res.send(serverResp);
   } catch (err) {
-    res.status(400).send("bad delete");
+    console.error(err);
+    res.status(400).send(JSON.stringify(err));
   }
 });
 
 app.get("/edit-workouts", (req, res) => {
+  res.send("EDITING WORKOUTS NOT IMPLEMENTED");
+  return;
   const user_email = req2email(req);
   const columns = [
     "id",
@@ -263,22 +269,32 @@ app.get("/edit-workouts", (req, res) => {
 
 app.get("/edit-machines", (req, res) => {
   const user_email = req2email(req);
-  const columns = ["id", "name", "datetime", "note", "display_order"].map(
-    (i) => {
-      const out = {};
-      if (i == "id") {
-        out.readonly = "readonly";
-      } else out.readonly = "";
-
-      out.key = i;
-      return out;
-    },
-  );
+  const columns = [
+    { key: "id", input_type: "number", readonly: "readonly" },
+    { key: "name", input_type: "text" },
+    { key: "datetime", input_type: "text" },
+    { key: "display_order", input_type: "number" },
+    { key: "weight_active", input_type: "number" },
+    { key: "reps_active", input_type: "number" },
+    { key: "duration_active", input_type: "number" },
+    { key: "distance_active", input_type: "number" },
+    { key: "watts_active", input_type: "number" },
+  ];
   res.render("edit-page", {
     user: req.oidc.user,
     items: getMachines(user_email),
     endpoint: "machine",
     columns,
+  });
+});
+
+app.get("/get-submit-workout-form", (req, res) => {
+  const user_email = req2email(req);
+  const machine = getMachines(user_email)[0];
+  res.render("submit-workout-form", {
+    layout: "bare",
+    user: req.oidc.user,
+    machine,
   });
 });
 
