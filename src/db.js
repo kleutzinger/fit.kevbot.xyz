@@ -51,6 +51,33 @@ const userSchema = z.object({
   note: z.string().optional(),
   datetime: z.coerce.string().datetime(),
 });
+// get zod object keys recursively
+const zodKeys = (schema) => {
+  // make sure schema is not null or undefined
+  if (schema === null || schema === undefined) return [];
+  // check if schema is nullable or optional
+  if (schema instanceof z.ZodNullable || schema instanceof z.ZodOptional)
+    return zodKeys(schema.unwrap());
+  // check if schema is an array
+  if (schema instanceof z.ZodArray) return zodKeys(schema.element);
+  // check if schema is an object
+  if (schema instanceof z.ZodObject) {
+    // get key/value pairs from schema
+    const entries = Object.entries(schema.shape);
+    // loop through key/value pairs
+    return entries.flatMap(([key, value]) => {
+      // get nested keys
+      const nested =
+        value instanceof z.ZodType
+          ? zodKeys(value).map((subKey) => `${key}.${subKey}`)
+          : [];
+      // return nested keys
+      return nested.length ? nested : key;
+    });
+  }
+  // return empty array
+  return [];
+};
 
 function initUser(user_email) {
   if (!user_email) throw new Error("user_email is required");
@@ -85,6 +112,14 @@ function initUser(user_email) {
       duration_active: true,
       distance_active: true,
     },
+    {
+      name: "My Custom Activity",
+      weight_active: true,
+      reps_active: true,
+      distance_active: true,
+      duration_active: true,
+      watts_active: true,
+    },
   ].map((vals, idx) => {
     const toInsert = machineSchema.parse({
       datetime: new Date().toISOString(),
@@ -101,11 +136,11 @@ function initUser(user_email) {
 const insertManyMachines = (machines) => {
   const insert = db.prepare(
     `INSERT INTO machines
-          (name, datetime, user_email, display_order,
-           distance_active, weight_active, duration_active, reps_active, watts_active)
-    VALUES (@name, @datetime, @user_email, @display_order,
-            @distance_active, @weight_active, @duration_active, @reps_active, @watts_active)
-    `,
+            (name, datetime, user_email, display_order,
+             distance_active, weight_active, duration_active, reps_active, watts_active)
+      VALUES (@name, @datetime, @user_email, @display_order,
+              @distance_active, @weight_active, @duration_active, @reps_active, @watts_active)
+      `,
   );
 
   for (const machine of machines) {
@@ -118,11 +153,11 @@ const insertManyWorkouts = (workouts) => {
     console.table(workout);
     db.prepare(
       `INSERT INTO workouts
-        (weight, reps, datetime, user_email, note, 
-         duration, distance, watts, machine_id)
-      VALUES
-        (@weight, @reps, @datetime, @user_email, @note,
-          @duration, @distance, @watts, @machine_id)`,
+          (weight, reps, datetime, user_email, note, 
+           duration, distance, watts, machine_id)
+        VALUES
+          (@weight, @reps, @datetime, @user_email, @note,
+            @duration, @distance, @watts, @machine_id)`,
     ).run(workout);
   }
 };
@@ -146,12 +181,28 @@ const getMachineNames = (user_email) => {
     .map((x) => `${x.name}`);
 };
 
-const getWorkouts = (user_email, limit) => {
-  return db
-    .prepare(
-      "SELECT * FROM workouts WHERE user_email = ? ORDER BY datetime DESC LIMIT ?",
-    )
-    .all(user_email, limit || 10000);
+const getWorkouts = (user_email, machine_id, limit) => {
+  const sql = `
+    SELECT 
+      workouts.*,
+      machines.name AS machine_name,
+      machines.id AS machine_id,
+      machines.weight_active AS weight_active,
+      machines.reps_active AS reps_active,
+      machines.duration_active AS duration_active,
+      machines.distance_active AS distance_active,
+      machines.watts_active AS watts_active
+    FROM workouts
+    LEFT JOIN machines ON workouts.machine_id = machines.id
+    WHERE workouts.user_email = ?
+    ${machine_id ? "AND workouts.machine_id = ?" : ""}
+    ORDER BY workouts.datetime DESC
+    LIMIT ?
+    `;
+  if (machine_id) {
+    return db.prepare(sql).all(user_email, machine_id, limit || 10000);
+  }
+  return db.prepare(sql).all(user_email, limit || 10000);
 };
 
 const getMachines = (user_email, limit) => {
@@ -213,8 +264,6 @@ function getJSON(user_email) {
       )
       .all(user_email)
       .map((x) => {
-        delete x.id;
-        delete x.user_email;
         return x;
       });
 
@@ -265,6 +314,7 @@ export {
   initUser,
   getCSV,
   getJSON,
+  zodKeys,
   db,
   deleteWorkout,
   insertManyWorkouts,

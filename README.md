@@ -65,7 +65,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] weight units in db (as text on machines)
 - [ ] distance units (as text on machines)
 - [ ] fix "machine" language on display
-- [ ] show machine_name properly throughout !!!!
+- [x] show machine_name properly throughout
 - [ ] start actually using it in the gym
 - [ ] select machine in main page !!!!
 - [x] navbar

@@ -1,28 +1,34 @@
-{{#with machine}}
+{{#if htmx}}
+{{>htmx}}
+{{/if}}
+<script></script>
 <form
-  hx-post="/submit-workout"
+  hx-post="{{endpoint}}"
   hx-swap="innerHTML"
   hx-target="#output"
   hx-params="not machine_name"
 >
   <div>
-    <p class="text-3xl">{{name}}</p>
-    <input name="machine_id" id="machine_id" readonly hidden value="{{id}}" />
+    <p class="text-3xl">{{machine.name}}</p>
+    <input name="machine_id" id="machine_id" readonly value="{{machine.id}}" />
   </div>
   <div>
-    {{#if weight_active}}
+    {{#if machine.weight_active}}
     <input
       name="weight"
       id="weight"
       class="bg-red-200"
       autocomplete="off"
       inputmode="numeric"
+      {{#if workout}}
+      value="{{workout.weight}}"
+      {{/if}}
       type="text"
     />
     <label for="weight">Weight</label>
     {{/if}}
   </div>
-  {{#if watts_active}}
+  {{#if machine.watts_active}}
   <div>
     <input
       name="watts"
@@ -31,10 +37,13 @@
       autocomplete="off"
       inputmode="numeric"
       type="text"
+      {{#if workout}}
+      value="{{workout.watts}}"
+      {{/if}}
     />
     <label for="watts">Watts</label>
   </div>
-  {{/if}} {{#if reps_active}}
+  {{/if}} {{#if machine.reps_active}}
   <div>
     <input
       name="reps"
@@ -43,10 +52,13 @@
       class="bg-green-200"
       inputmode="numeric"
       type="text"
+      {{#if workout}}
+      value="{{workout.reps}}"
+      {{/if}}
     />
     <label for="reps">Reps</label>
   </div>
-  {{/if}} {{#if distance_active}}
+  {{/if}} {{#if machine.distance_active}}
   <div>
     <input
       name="distance"
@@ -55,10 +67,13 @@
       class="bg-green-200"
       inputmode="numeric"
       type="text"
+      {{#if workout}}
+      value="{{workout.distance}}"
+      {{/if}}
     />
     <label for="distance">Distance</label>
     <div>
-      {{/if}} {{#if duration_active}}
+      {{/if}} {{#if machine.duration_active}}
       <div>
         <p>Duration (H:M:S):</p>
         <input
@@ -67,6 +82,9 @@
           autocomplete="off"
           inputmode="numeric"
           placeholder="0"
+          {{#if workout}}
+          hidden readonly
+          {{/if}}
           class="bg-purple-200 w-20"
         />
         <label for="duration">:</label>
@@ -77,6 +95,9 @@
           inputmode="numeric"
           placeholder="0"
           class="bg-purple-200 w-20"
+          {{#if workout}}
+          hidden readonly
+          {{/if}}
         />
         <label for="duration">:</label>
         <input
@@ -86,10 +107,12 @@
           inputmode="numeric"
           placeholder="0"
           class="bg-purple-200 w-20"
+          {{#if workout}}
+          value="{{workout.duration}}"
+          {{/if}}
         />
-        <label for="duration_m">Sec</label>
+        <label for="duration_s">Sec</label>
       </div>
-
       {{/if}}
       <input
         name="note"
@@ -97,12 +120,43 @@
         autocomplete="off"
         class="bg-blue-200"
         type="text"
+        {{#if workout}}
+        value="{{workout.note}}"
+        {{/if}}
       />
       <label for="note">Note</label>
     </div>
+    {{#if workout}}
     <div>
-      <button class="mt-5 btn btn-blue">Submit new exercise log</button>
+    <input
+      name="datetime"
+      id="datetime"
+      autocomplete="off"
+      class="bg-blue-200"
+      type="text"
+      value="{{workout.datetime}}"
+    />
+    </div>
+    {{/if}}
+    <div>
+      <button class="mt-5 btn btn-blue">
+        {{#if workout}}
+        Submit Workout Update
+        {{else}}
+        Submit Workout
+        {{/if}}
+      </button>
     </div>
   </div>
 </form>
-{{/with}}
+{{#if workout}}
+<div>
+  <button
+    class="btn btn-red mt-5"
+    hx-post="/delete-workout?id={{workout.id}}"
+    hx-swap="innerHTML"
+    hx-target="#workout-form"
+  >
+    Delete Workout
+  </button>
+{{/if}}

@@ -2,14 +2,18 @@
 <script src="/client.js"></script>
 <div class="grid grid-cols-1 justify-items-center p-8">
   {{> line-break text='*' }}
-  <span hx-get="/get-submit-workout-form" hx-trigger="load"></span>
+  <span
+    id="workout-form"
+    hx-get="/get-submit-workout-form"
+    hx-trigger="load"
+  ></span>
   <p id="output"></p>
   {{> line-break text='*' }}
   <div
     href="#"
     class="text-xl"
-    id="workout-history"
-    hx-get="/workouts?limit=20"
+    id="workout-table"
+    hx-get="/workouts-table?limit=20"
     hx-trigger="workout-modified from:body, onFocus, load"
     hx-swap="innerHTML"
   ></div>

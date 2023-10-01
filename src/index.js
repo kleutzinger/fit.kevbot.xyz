@@ -17,24 +17,23 @@ const app = express();
 const port = process.env.PORT || 5000;
 const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
-import { engine } from "express-handlebars";
-app.engine(
-  ".hbs.html",
-  engine({
-    defaultLayout: "page",
-    extname: ".hbs.html",
-    helpers: {
-      ifeq: function (a, b, options) {
-        if (a === b) {
-          return options.fn(this);
-        }
-        return options.inverse(this);
-      },
+import { create } from "express-handlebars";
+const hbs = create({
+  defaultLayout: "page",
+  extname: ".hbs.html",
+  helpers: {
+    ifeq: function (a, b, options) {
+      if (a === b) {
+        return options.fn(this);
+      }
+      return options.inverse(this);
     },
-  }),
-);
+  },
+});
+const viewsDir = join(__dirname, "views");
+app.engine(".hbs.html", hbs.engine);
 app.set("view engine", "hbs.html");
-app.set("views", join(__dirname, "views"));
+app.set("views", viewsDir);
 import pkg from "body-parser";
 import {
   getMachineNames,
@@ -50,6 +49,7 @@ import {
   machineSchema,
   getJSON,
   initUser,
+  zodKeys,
 } from "./db.js";
 
 const { urlencoded } = pkg;
@@ -117,17 +117,34 @@ app.get("/download-json", (req, res) => {
   res.json(jsonText);
 });
 
-app.get("/workouts", (req, res) => {
-  const { limit } = req.query;
-  const user_email = req2email(req);
-  const workouts = getWorkouts(user_email, limit)
-    .slice(0, limit)
-    .map((workout) => {
-      workout.ago = timeAgo.format(new Date(workout.datetime), "mini");
-      return workout;
-    });
-  const columns = ["machine_name", "weight", "reps", "ago", "duration", "note"];
-  res.render("workout-table", { layout: "bare", workouts, columns });
+app.get("/workouts-table", (req, res) => {
+  try {
+    const { limit } = req.query;
+    const user_email = req2email(req);
+    const machine_id = req.query?.machine_id;
+    const workouts = getWorkouts(user_email, machine_id, limit)
+      .slice(0, limit)
+      .map((workout) => {
+        workout.ago = timeAgo.format(new Date(workout.datetime), "mini");
+        return workout;
+      });
+    console.table(workouts);
+    const columns = [
+      "machine_name",
+      "weight",
+      "weight_active",
+      "reps",
+      "ago",
+      "duration",
+      "note",
+      "id",
+      "machine_id",
+    ];
+    res.render("workout-table", { layout: "bare", workouts, columns });
+  } catch (err) {
+    console.error(err);
+    res.send(JSON.stringify(err));
+  }
 });
 
 app.post("/submit-workout", (req, res) => {
@@ -185,14 +202,22 @@ app.get("/style.css", (_, res) => {
   res.sendFile(join(__dirname, "output.css"));
 });
 
-app.post("/update-workout", (req, res) => {
+app.post("/update-workout/:id", (req, res) => {
   try {
+    console.table(req.body);
     const user_email = req2email(req);
-    const workout_id = req.body.id;
+    const workout_id = req.params?.id;
+    if (!workout_id) {
+      throw new Error("No workout id provided");
+    }
     req.body.user_email = user_email;
+    if (req.body.duration_s) {
+      req.body.duration = parseInt(req.body.duration_s);
+    }
     const newWorkout = workoutSchema.parse(req.body);
     newWorkout.id = workout_id;
     const serverResp = updateDBItem("workouts", newWorkout);
+    res.setHeader("HX-Trigger", "workout-modified");
     res.send(serverResp);
   } catch (err) {
     console.error(err);
@@ -220,6 +245,7 @@ app.post("/delete-workout", (req, res) => {
     const user_email = req2email(req);
     const workout_id = req?.query?.id;
     const serverResp = deleteWorkout(workout_id, user_email);
+    res.setHeader("HX-Trigger", "workout-modified");
     res.send(serverResp);
   } catch (err) {
     console.error(err);
@@ -239,47 +265,42 @@ app.post("/delete-machine", (req, res) => {
   }
 });
 
-app.get("/edit-workouts", (req, res) => {
-  res.send("EDITING WORKOUTS NOT IMPLEMENTED");
-  return;
-  const user_email = req2email(req);
-  const columns = [
-    "id",
-    "machine_name",
-    "weight",
-    "reps",
-    "datetime",
-    "duration",
-    "note",
-  ].map((i) => {
-    const out = {};
-    if (i == "id") {
-      out.readonly = "readonly";
-    } else out.readonly = "";
-    out.key = i;
-    return out;
-  });
-  res.render("edit-page", {
-    user: req.oidc.user,
-    items: getWorkouts(user_email),
-    endpoint: "workout",
-    columns,
-  });
-});
+// app.get("/edit-workouts", (req, res) => {
+//   const user_email = req2email(req);
+//   const columns = zodSchemaToEditColumns(workoutSchema);
+//   const workouts = getWorkouts(user_email);
+//   columns.push({
+//     key: "machine_name",
+//     input_type: "text",
+//     readonly: "readonly",
+//   });
+//   res.render("edit-page", {
+//     user: req.oidc.user,
+//     items: workouts,
+//     endpoint: "workout",
+//     columns,
+//   });
+// });
+
+const zodSchemaToEditColumns = (schema) => {
+  const readonly = ["id"];
+  const hidden = ["user_email", "machine_id"];
+  return zodKeys(schema)
+    .filter((i) => !hidden.includes(i))
+    .map((i) => {
+      const out = {};
+      if (readonly.includes(i)) {
+        out.readonly = "readonly";
+      }
+      out.key = i;
+      out.input_type = "text";
+      return out;
+    });
+};
 
 app.get("/edit-machines", (req, res) => {
   const user_email = req2email(req);
-  const columns = [
-    { key: "id", input_type: "number", readonly: "readonly" },
-    { key: "name", input_type: "text" },
-    { key: "datetime", input_type: "text" },
-    { key: "display_order", input_type: "number" },
-    { key: "weight_active", input_type: "number" },
-    { key: "reps_active", input_type: "number" },
-    { key: "duration_active", input_type: "number" },
-    { key: "distance_active", input_type: "number" },
-    { key: "watts_active", input_type: "number" },
-  ];
+  const columns = zodSchemaToEditColumns(machineSchema);
   res.render("edit-page", {
     user: req.oidc.user,
     items: getMachines(user_email),
@@ -295,6 +316,36 @@ app.get("/get-submit-workout-form", (req, res) => {
     layout: "bare",
     user: req.oidc.user,
     machine,
+    endpoint: "/submit-workout",
+  });
+});
+
+//
+//   res.render("edit-workout-page", {
+//   });
+//
+// app.get("/get-edit-workout-page/:id", (req, res) => {
+//   hbs
+//     .render(join("some.hbs"), { title: "Title", body: "Body" })
+//     .then((renderedHtml) => {
+//       response.send({ html: renderedHtml });
+//     });
+// });
+
+app.get("/get-edit-workout-form/:id", (req, res) => {
+  const user_email = req2email(req);
+  const machine = getMachines(user_email)[0];
+  const workout = getWorkouts(user_email).find((i) => i.id == req.params?.id);
+  if (!workout) {
+    return res.send(`<a href="/">back</a><br/>No workout found with that id`);
+  }
+  res.render("submit-workout-form", {
+    layout: "bare",
+    endpoint: `/update-workout/${workout.id}`,
+    user: req.oidc.user,
+    machine,
+    workout,
+    htmx: true,
   });
 });
 

@@ -9,7 +9,7 @@ addEventListener("focus", (event) => {
     firstFocus = false;
     return;
   }
-  htmx.trigger("#workout-history", "onFocus");
+  htmx.trigger("#workouts-table", "onFocus");
 });
 setTimeout(() => {
   firstFocus = false;

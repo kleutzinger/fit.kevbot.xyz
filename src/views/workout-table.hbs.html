@@ -4,6 +4,7 @@
       {{#each columns}}
       <th scope="col" class="text-lg px-4 py4">{{this}}</th>
       {{/each}}
+      <th scope="col" class="text-lg px-4 py4">edit</th>
     </tr>
   </thead>
   <tbody>
@@ -12,6 +13,14 @@
       {{#each ../columns as |column|}}
       <td>{{lookup workout column}}</td>
       {{/each}}
+      <td>
+        <a
+          hx-target="#workout-form"
+          hx-get="/get-edit-workout-form/{{workout.id}}"
+          hx-trigger="click"
+          >edit</a
+        >
+      </td>
     </tr>
     {{/each}}
   </tbody>
