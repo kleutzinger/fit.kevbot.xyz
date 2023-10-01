@@ -1,11 +1,18 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <title>Kevin's workout tracker</title>
+    <meta
+      name="description"
+      content="Kevin's workout tracker. Track your workouts."
+    />
     <meta charset="UTF-8" />
-    <title>Full Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/style.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   </head>
   <body>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    {{> navbar}}
     <div class="container">
       <div class="row">
         <div class="col-md-12">{{{body}}}</div>

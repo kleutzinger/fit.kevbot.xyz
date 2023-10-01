@@ -21,6 +21,7 @@ import { engine } from "express-handlebars";
 app.engine(
   ".hbs.html",
   engine({
+    defaultLayout: "page",
     extname: ".hbs.html",
     helpers: {
       ifeq: function (a, b, options) {
@@ -86,7 +87,7 @@ app.get("/machine-list", (req, res) => {
 });
 
 app.get("/user-info", (req, res) => {
-  res.render("user-info", { user: req.oidc.user });
+  res.render("user-info", { layout: "bare", user: req.oidc.user });
 });
 
 app.get("/download-db", (req, res) => {
@@ -121,18 +122,20 @@ app.get("/workouts", (req, res) => {
       return workout;
     });
   const columns = ["machine_name", "weight", "reps", "ago", "duration", "note"];
-  res.render("workout-table", { workouts, columns });
+  res.render("workout-table", { layout: "bare", workouts, columns });
 });
 
 app.post("/submit-workout", (req, res) => {
   const user_email = req2email(req);
   req.body.datetime = new Date().toISOString();
   req.body.user_email = user_email;
-  const hms2sec = (hms) => {
-    const [h, m, s] = hms.split(":").map((x) => parseInt(x));
-    return parseInt(h * 3600 + m * 60 + s);
-  };
-  req.body.duration = hms2sec(req.body.duration);
+  req.body.duration_s = parseInt(req.body.duration_s || 0);
+  req.body.duration_m = parseInt(req.body.duration_m || 0);
+  req.body.duration_h = parseInt(req.body.duration_h || 0);
+  req.body.duration =
+    req.body.duration_s +
+    req.body.duration_m * 60 +
+    req.body.duration_h * 60 * 60;
   let submitObj = {};
   try {
     submitObj = workoutSchema.parse(req.body);
@@ -144,9 +147,10 @@ app.post("/submit-workout", (req, res) => {
     ) {
       return res.send("Please fill out at least one field");
     }
+    console.table(submitObj);
     const serverResp = addWorkout(submitObj);
     res.setHeader("HX-Trigger", "workout-modified");
-    res.send(`submit success`);
+    res.send(serverResp);
   } catch (err) {
     console.error(err);
     res.send(err?.issues);
@@ -245,7 +249,6 @@ app.get("/edit-workouts", (req, res) => {
     return out;
   });
   res.render("edit-page", {
-    layout: "full-page",
     user: req.oidc.user,
     items: getWorkouts(user_email),
     endpoint: "workout",
@@ -267,7 +270,6 @@ app.get("/edit-machines", (req, res) => {
     },
   );
   res.render("edit-page", {
-    layout: "full-page",
     user: req.oidc.user,
     items: getMachines(user_email),
     endpoint: "machine",
@@ -276,12 +278,17 @@ app.get("/edit-machines", (req, res) => {
 });
 
 app.get("/admin", (_, res) => {
-  res.sendFile(__dirname + "/admin.html");
+  res.render("admin");
+});
+
+app.get("/graph", (req, res) => {
+  initUser(req2email(req));
+  res.render("graph");
 });
 
 app.get("/", (req, res) => {
   initUser(req2email(req));
-  res.render("index", { user: req.oidc.user });
+  res.render("index");
 });
 
 app.listen(port, () => {

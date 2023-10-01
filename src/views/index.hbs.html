@@ -1,112 +1,109 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <title>Kevin's workout tracker</title>
-    <meta
-      name="description"
-      content="Kevin's workout tracker. Track your workouts."
-    />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="/style.css" rel="stylesheet" />
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html-duration-picker@latest/dist/html-duration-picker.min.js"></script>
-  </head>
-  <body>
-    <div class="grid grid-cols-1 justify-items-center p-8">
-      {{> line-break text='top' }}
-      <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
-        <div>
-          <select
-            name="machine_name"
-            id="machine_name"
-            hx-get="/machine-list"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-            hx-target="this"
-          ></select>
-          <label for="machine_name">Exercise Name</label>
-        </div>
-        <div>
-          <input
-            name="weight"
-            id="weight"
-            class="bg-red-200"
-            autocomplete="off"
-            inputmode="numeric"
-            type="text"
-          />
-          <label for="weight">Weight/Watts</label>
-        </div>
-        <div>
-          <input
-            name="reps"
-            id="reps"
-            autocomplete="off"
-            class="bg-green-200"
-            inputmode="numeric"
-            type="text"
-          />
-          <label for="reps">Reps</label>
-        </div>
-        <div>
-          <input
-            name="note"
-            id="note"
-            autocomplete="off"
-            class="bg-blue-200"
-            type="text"
-          />
-          <label for="note">Note</label>
-        </div>
-        <div>
-          <input
-            name="duration"
-            id="duration"
-            autocomplete="off"
-            inputmode="numeric"
-            class="bg-purple-200 html-duration-picker"
-          />
-          <label for="duration">Duration</label>
-        </div>
-        <div>
-          <button class="mt-5 btn btn-blue">Submit new exercise log</button>
-        </div>
-      </form>
-      <p id="output"></p>
-      {{> line-break text='bottom' }}
-      <!-- <label for="cur-machine-only">Cur machine only</label> -->
-      <!-- <input type="checkbox" id="cur-machine-only" onchange="console.log(this.checked)" /> -->
-      <div
-        href="#"
-        class="text-xl"
-        id="workout-history"
-        hx-get="/workouts?limit=20"
-        hx-trigger="workout-modified from:body, onFocus, load"
-        hx-swap="innerHTML"
-      ></div>
-      <a class="text-xl" href="/admin">admin</a>
-      <a class="text-xl" href="/edit-machines">edit saved machines</a>
-      <a class="text-xl" href="/edit-workouts">edit workout logs</a>
-      <p
-        class="text-center"
-        hx-get="/user-info"
+<div class="grid grid-cols-1 justify-items-center p-8">
+  {{> line-break text='top' }}
+  <form hx-post="/submit-workout" hx-swap="innerHTML" hx-target="#output">
+    <div>
+      <select
+        name="machine_name"
+        id="machine_name"
+        hx-get="/machine-list"
         hx-trigger="load"
         hx-swap="innerHTML"
-      ></p>
+        hx-target="this"
+      ></select>
+      <label for="machine_name">Exercise Name</label>
     </div>
-    <script src="/client.js"></script>
-    <script type="text/javascript">
-      (function () {
-        const cdn_script_url =
-          "https://cdn.jsdelivr.net/npm/kevbadge/kevbadge.js";
-        let kevbadge = document.createElement("script");
-        kevbadge.type = "text/javascript";
-        kevbadge.async = true;
-        kevbadge.src = cdn_script_url;
-        let s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(kevbadge, s);
-      })();
-    </script>
-  </body>
-</html>
+    <div>
+      <input
+        name="weight"
+        id="weight"
+        class="bg-red-200"
+        autocomplete="off"
+        inputmode="numeric"
+        type="text"
+      />
+      <label for="weight">Weight/Watts</label>
+    </div>
+    <div>
+      <input
+        name="reps"
+        id="reps"
+        autocomplete="off"
+        class="bg-green-200"
+        inputmode="numeric"
+        type="text"
+      />
+      <label for="reps">Reps</label>
+    </div>
+    <div>
+      <input
+        name="note"
+        id="note"
+        autocomplete="off"
+        class="bg-blue-200"
+        type="text"
+      />
+      <label for="note">Note</label>
+    </div>
+    <div>
+      <p>Duration (H:M:S):</p>
+      <input
+        name="duration_h"
+        id="duration_h"
+        autocomplete="off"
+        inputmode="numeric"
+        placeholder="0"
+        class="bg-purple-200 w-20"
+      />
+      <label for="duration">:</label>
+      <input
+        name="duration_m"
+        id="duration_m"
+        autocomplete="off"
+        inputmode="numeric"
+        placeholder="0"
+        class="bg-purple-200 w-20"
+      />
+      <label for="duration">:</label>
+      <input
+        name="duration_s"
+        id="duration_s"
+        autocomplete="off"
+        inputmode="numeric"
+        placeholder="0"
+        class="bg-purple-200 w-20"
+      />
+      <label for="duration_m">Sec</label>
+    </div>
+    <div>
+      <button class="mt-5 btn btn-blue">Submit new exercise log</button>
+    </div>
+  </form>
+  <p id="output"></p>
+  {{> line-break text='bottom' }}
+  <div
+    href="#"
+    class="text-xl"
+    id="workout-history"
+    hx-get="/workouts?limit=20"
+    hx-trigger="workout-modified from:body, onFocus, load"
+    hx-swap="innerHTML"
+  ></div>
+  <p
+    class="text-center"
+    hx-get="/user-info"
+    hx-trigger="load"
+    hx-swap="innerHTML"
+  ></p>
+</div>
+<script src="/client.js"></script>
+<script type="text/javascript">
+  (function () {
+    const cdn_script_url = "https://cdn.jsdelivr.net/npm/kevbadge/kevbadge.js";
+    let kevbadge = document.createElement("script");
+    kevbadge.type = "text/javascript";
+    kevbadge.async = true;
+    kevbadge.src = cdn_script_url;
+    let s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(kevbadge, s);
+  })();
+</script>

@@ -1,0 +1,12 @@
+<div class="container mx-auto p-5">
+  <a href="/logout">log out</a>
+  <form hx-post="/new-machine">
+    <input name="name" class="machine-input" type="text" />
+    <br />
+    <button class="btn btn-blue">Submit new machine</button>
+  </form>
+  <a href="/download-csv">download-csv</a>
+  <a href="/download-json">download-json</a>
+  <div hx-get="/user-info" hx-replace="this" hx-trigger="load"></div>
+  <p id="output"></p>
+</div>

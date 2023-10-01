@@ -1,0 +1,43 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<select
+  name="machine_name"
+  id="machine_name"
+  hx-get="/machine-list"
+  hx-trigger="load"
+  hx-swap="innerHTML"
+></select>
+<canvas id="canvas"></canvas>
+<script>
+  (async () => {
+    var resp = await fetch("/download-json");
+    var json = await resp.json();
+    // extract just the workouts
+    const workouts = json.workouts;
+    workouts.sort(function (a, b) {
+      return new Date(a.datetime) - new Date(b.datetime);
+    });
+    var labels = workouts.map(function (e) {
+      return new Date(e.datetime).toLocaleDateString();
+    });
+    var data = workouts.map(function (e) {
+      return e.weight;
+    });
+
+    var ctx = canvas.getContext("2d");
+    var config = {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Graph Line",
+            data: data,
+            backgroundColor: "rgba(0, 119, 204, 0.3)",
+          },
+        ],
+      },
+    };
+
+    var chart = new Chart(ctx, config);
+  })();
+</script>
