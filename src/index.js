@@ -90,6 +90,11 @@ app.get("/user-info", (req, res) => {
   res.render("user-info", { layout: "bare", user: req.oidc.user });
 });
 
+app.get("/user-email", (req, res) => {
+  const user_email = req2email(req);
+  res.send(user_email);
+});
+
 app.get("/download-db", (req, res) => {
   const user_email = req2email(req);
   res.sendFile(join(__dirname, "..", db_dir, user_email));
