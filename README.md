@@ -73,6 +73,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] add machine bring back!!!
 - [x] filter to relevant columns in history table
 - [x] navbar
+- [ ] make it more single-pagey
 
 ## Rough UI
 

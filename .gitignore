@@ -133,3 +133,4 @@ db/*
 !db/.gitkeep
 
 src/output.css
+public/style.css

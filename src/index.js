@@ -221,10 +221,6 @@ app.post("/new-machine", (req, res) => {
   }
 });
 
-app.get("/style.css", (_, res) => {
-  res.sendFile(join(__dirname, "output.css"));
-});
-
 app.post("/update-workout/:id", (req, res) => {
   try {
     const user_email = req2email(req);
@@ -377,6 +373,19 @@ app.get("/graph", (req, res) => {
 });
 
 app.get("/machine-links", (req, res) => {
+  const user_email = req2email(req);
+  const machines = getMachines(user_email);
+  res.send(
+    html`${machines
+      .map(
+        (machine) =>
+          `<a href="/?machine_id=${machine.id}"><button class="btn btn-blue">${machine.name}</button></a>`,
+      )
+      .join("")}`,
+  );
+});
+
+app.get("/machine-selection", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachines(user_email);
   res.send(

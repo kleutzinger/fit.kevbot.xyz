@@ -11,11 +11,11 @@
     "start": "node src/index.js",
     "prestart": "npm run init-db",
     "test": "node test/test.js",
-    "build": "tailwindcss -i ./src/style.css -o ./src/output.css",
+    "build": "tailwindcss -i ./src/input.css -o ./public/style.css",
     "dev": "concurrently \"npm:watch-node\" \"npm:watch-tailwind\"",
     "init-db": "node src/init-db.js",
     "watch-node": "nodemon src/index.js",
-    "watch-tailwind": "tailwindcss -i ./src/style.css -o ./src/output.css --watch"
+    "watch-tailwind": "tailwindcss -i ./src/input.css -o ./public/style.css --watch"
   },
   "author": "Kevin Leutzinger",
   "license": "MIT",
