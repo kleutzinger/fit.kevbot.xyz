@@ -61,7 +61,7 @@ app.use(urlencoded({ extended: true }));
 import { auth } from "express-openid-connect";
 
 const auth0Config = {
-  authRequired: NO_AUTH ? false : true,
+  authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_RANDOM_STRING,
   baseURL: base_url,
@@ -69,15 +69,34 @@ const auth0Config = {
   issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
 };
 
-// auth router attaches /login, /logout, and /callback routes to the baseURL
+// no auth required for these routes
+
+// redirect here if not authenticated
+app.get("/signup", (req, res) => {
+  res.render("signup", { layout: "bare" });
+});
+
+// Middleware to check if user is authenticated
+const unauthorizedToSignup = (req, res, next) => {
+  if (!req.oidc.isAuthenticated() && !NO_AUTH) {
+    // Redirect unauthenticated users to the signup page
+    return res.redirect("/signup");
+  }
+  next();
+};
+
+app.use(express.static(join(__dirname, "..", "public")));
+
+// auth required everything below
 app.use(auth(auth0Config));
+
+// apply checkAuth to all routes
+app.use(unauthorizedToSignup);
 
 function req2email(req) {
   if (NO_AUTH) return "NOAUTH@fake.com";
   return req?.oidc?.user?.email;
 }
-
-app.use(express.static(join(__dirname, "..", "public")));
 
 app.get("/machine-options", (req, res) => {
   const user_email = req2email(req);
@@ -134,7 +153,6 @@ app.get("/workouts-table", (req, res) => {
     for (const key of ["weight", "reps", "duration", "distance", "watts"]) {
       const key_a = `${key}_active`;
       const is_active = machine[key_a];
-      console.log(key, key_a, is_active);
       if (is_active) {
         columns.push(key);
       } else {
@@ -268,23 +286,6 @@ app.post("/delete-machine", (req, res) => {
     res.status(400).send(JSON.stringify(err));
   }
 });
-
-// app.get("/edit-workouts", (req, res) => {
-//   const user_email = req2email(req);
-//   const columns = zodSchemaToEditColumns(workoutSchema);
-//   const workouts = getWorkouts(user_email);
-//   columns.push({
-//     key: "machine_name",
-//     input_type: "text",
-//     readonly: "readonly",
-//   });
-//   res.render("edit-page", {
-//     user: req.oidc.user,
-//     items: workouts,
-//     endpoint: "workout",
-//     columns,
-//   });
-// });
 
 const zodSchemaToEditColumns = (schema) => {
   const readonly = ["id"];

@@ -12,9 +12,7 @@ import { Parser } from "@json2csv/plainjs";
 const DB_DIR = process.env.DB_DIR || "./db";
 const DB_NAME = process.env.DB_NAME || "db.sqlite";
 const DB_PATH = join(DB_DIR, DB_NAME);
-// verbose if in dev
-// const verbose = process.env.NODE_ENV === "development" ? console.log : null;
-const verbose = console.log;
+const verbose = process.env.NODE_ENV === "development" ? console.log : null;
 const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 

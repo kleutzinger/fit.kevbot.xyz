@@ -11,7 +11,9 @@
   <div>
     {{#if workout}}
     <p class="text-3xl">Edit {{machine.name}}</p>
-    <a href="/?machine_id={{workout.machine_id}}">back to add workout</a>
+    <a href="/?machine_id={{workout.machine_id}}">
+      <h3 class="btn btn-blue">back to workout logging</h3>
+    </a>
     {{else}}
     <p class="text-3xl mb-2">Add Log: {{machine.name}}</p>
     {{/if}}
@@ -141,6 +143,7 @@
       type="text"
       value="{{workout.datetime}}"
     />
+    <label for="datetime">Date</label>
     </div>
     {{/if}}
     <div>
@@ -157,7 +160,7 @@
 {{#if workout}}
 <div>
   <button
-    class="btn btn-red mt-5"
+    class="btn btn-red my-20 py-12"
     hx-post="/delete-workout?id={{workout.id}}"
     hx-swap="innerHTML"
     hx-target="#workout-form"
