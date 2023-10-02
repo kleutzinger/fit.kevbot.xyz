@@ -127,7 +127,6 @@ function initUser(user_email) {
       display_order: idx,
       ...vals,
     });
-    console.table(toInsert);
     return toInsert;
   });
   insertManyMachines(starterMachines);
@@ -150,7 +149,6 @@ const insertManyMachines = (machines) => {
 
 const insertManyWorkouts = (workouts) => {
   for (const workout of workouts) {
-    console.table(workout);
     db.prepare(
       `INSERT INTO workouts
           (weight, reps, datetime, user_email, note, 
@@ -182,6 +180,7 @@ const getMachineNames = (user_email) => {
 };
 
 const getWorkouts = (user_email, machine_id, limit) => {
+  if (machine_id !== undefined) machine_id = parseInt(machine_id).toString();
   const sql = `
     SELECT 
       workouts.*,
@@ -208,27 +207,29 @@ const getWorkouts = (user_email, machine_id, limit) => {
 const getMachines = (user_email, limit) => {
   return db
     .prepare(
-      "SELECT * FROM machines WHERE user_email = ? ORDER BY datetime DESC LIMIT ?",
+      "SELECT * FROM machines WHERE user_email = ? ORDER BY display_order DESC LIMIT ?",
     )
     .all(user_email, limit || 10000);
 };
 
-const addMachineName = (machine_name, user_email) => {
+const getMachine = (user_email, machine_id) => {
+  return db
+    .prepare("SELECT * FROM machines WHERE user_email = ? AND id = ?")
+    .get(user_email, machine_id);
+};
+
+const addMachine = (user_email, machine) => {
   // get machine with largest display_order
-  const maybeMachine = db
+  const { display_order: biggest_display_order } = db
     .prepare(
-      "SELECT * FROM machines WHERE user_email = ? ORDER BY display_order DESC LIMIT 1",
+      `SELECT display_order FROM machines WHERE
+        user_email = ? ORDER BY display_order DESC LIMIT 1`,
     )
     .get(user_email);
-  const display_order = maybeMachine ? maybeMachine.display_order + 1 : 0;
-  const obj = {
-    name: machine_name,
-    datetime: new Date().toISOString(),
-    user_email: user_email,
-    display_order: display_order,
-  };
-  insertManyMachines([obj]);
-  return obj;
+  const display_order = (biggest_display_order || 0) + 1;
+  machine.display_order = display_order;
+  insertManyMachines([machine]);
+  return machine;
 };
 
 function getCSV(user_email) {
@@ -321,9 +322,10 @@ export {
   addWorkout,
   getMachineNames,
   getMachines,
+  getMachine,
   deleteMachine,
   updateDBItem,
-  addMachineName,
+  addMachine as addMachineName,
   getWorkouts,
   workoutSchema,
   machineSchema,

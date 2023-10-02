@@ -1,17 +1,22 @@
 {{#if htmx}}
 {{>htmx}}
 {{/if}}
-<script></script>
 <form
+  id="workout-form"
   hx-post="{{endpoint}}"
   hx-swap="innerHTML"
   hx-target="#output"
   hx-params="not machine_name"
 >
   <div>
-    <p class="text-3xl">{{machine.name}}</p>
-    <input name="machine_id" id="machine_id" readonly value="{{machine.id}}" />
+    {{#if workout}}
+    <p class="text-3xl">Edit {{machine.name}}</p>
+    <a href="/?machine_id={{workout.machine_id}}">back to add workout</a>
+    {{else}}
+    <p class="text-3xl mb-2">Add Log: {{machine.name}}</p>
+    {{/if}}
   </div>
+  <input name="machine_id" hidden readonly value="{{machine.id}}"/>
   <div>
     {{#if machine.weight_active}}
     <input
@@ -119,7 +124,7 @@
         id="note"
         autocomplete="off"
         class="bg-blue-200"
-        type="text"
+        type="textarea"
         {{#if workout}}
         value="{{workout.note}}"
         {{/if}}

@@ -1,10 +1,15 @@
 <link href="/style.css" rel="stylesheet" />
 <script src="/client.js"></script>
 <div class="grid grid-cols-1 justify-items-center p-8">
+  <button class="btn btn-blue" hx-swap="outerHTML" hx-get="/machine-links">Change Workout Type</button>
   {{> line-break text='*' }}
   <span
     id="workout-form"
+    {{#if machine_id}}
+    hx-get="/get-submit-workout-form?machine_id={{machine_id}}"
+    {{else}}
     hx-get="/get-submit-workout-form"
+    {{/if}}
     hx-trigger="load"
   ></span>
   <p id="output"></p>
@@ -13,7 +18,11 @@
     href="#"
     class="text-xl"
     id="workout-table"
+    {{#if machine_id}}
+    hx-get="/workouts-table?machine_id={{machine_id}}"
+    {{else}}
     hx-get="/workouts-table?limit=20"
+    {{/if}}
     hx-trigger="workout-modified from:body, onFocus, load"
     hx-swap="innerHTML"
   ></div>

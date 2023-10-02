@@ -27,7 +27,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] remove machines
 - [x] add a NO_AUTH env var
 - [x] display historical data
-  - [ ] display per-machine
+  - [x] display per-machine
 - [x] support multiple users
 - [x] support decimal parts for all numeric fields
 - [x] use templating engine
@@ -39,11 +39,12 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] private gh repo
 - [x] public gh repo
 - [x] make it look nicer
-- [ ] edit any field from edit page !!!! (I broke the machine editing page)
+- [x] edit any field from edit page !!!! (I broke the machine editing page)
+- [ ] improve look of edit machine page
 - [ ] explain why can't delete machine when workouts still present
 - [x] add column to order machines by
 - [x] auto update workout history onsubmit
-- [ ] optionally only show current machine's history
+- [x] always only show current machine's history
 - [x] delete workouts from db
 - [x] download db
 - [x] remake into single db
@@ -57,17 +58,17 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
   - [x] single updateDBItem
   - [ ] single deleteDBItem
   - [ ] single addDBItem?
-- [ ] displayName for columns in UI
 - [ ] upload db as csv (advanced)
 - [ ] add tests
-- [ ] start actually using it in the gym
 - [x] machine_id foreign key in workouts
 - [ ] weight units in db (as text on machines)
 - [ ] distance units (as text on machines)
 - [ ] fix "machine" language on display
 - [x] show machine_name properly throughout
 - [ ] start actually using it in the gym
-- [ ] select machine in main page !!!!
+- [x] select machine in main page
+- [x] add machine bring back!!!
+- [x] filter to relevant columns in history table
 - [x] navbar
 
 ## Rough UI
