@@ -2,7 +2,7 @@
 
 ## Website is live at
 
-https://tracker.kevbot.xyz
+https://fit.kevbot.xyz
 
 ## How to run this project
 
@@ -40,7 +40,6 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] public gh repo
 - [x] make it look nicer
 - [x] edit any field from edit page !!!! (I broke the machine editing page)
-- [ ] improve look of edit machine page
 - [ ] explain why can't delete machine when workouts still present
 - [x] add column to order machines by
 - [x] auto update workout history onsubmit
@@ -61,11 +60,15 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] upload db as csv (advanced)
 - [ ] add tests
 - [x] machine_id foreign key in workouts
-- [ ] weight units in db (as text on machines)
-- [ ] distance units (as text on machines)
+- Machine Editing
+  - [ ] add units
+    - https://www.npmjs.com/package/convert-units
+    - [ ] weight units in db (as text on machines)
+    - [ ] distance units (as text on machines)
+    - [ ] make zod enums
 - [ ] fix "machine" language on display
 - [x] show machine_name properly throughout
-- [ ] start actually using it in the gym
+- [x] start actually using it in the gym
 - [x] select machine in main page
 - [x] add machine bring back!!!
 - [x] filter to relevant columns in history table

@@ -35,20 +35,20 @@
     <label for="weight">Weight</label>
     {{/if}}
   </div>
-  {{#if machine.watts_active}}
+  {{#if machine.energy_active}}
   <div>
     <input
-      name="watts"
-      id="watts"
+      name="energy"
+      id="energy"
       class="bg-red-200"
       autocomplete="off"
       inputmode="numeric"
       type="text"
       {{#if workout}}
-      value="{{workout.watts}}"
+      value="{{workout.energy}}"
       {{/if}}
     />
-    <label for="watts">Watts</label>
+    <label for="energy">Energy</label>
   </div>
   {{/if}} {{#if machine.reps_active}}
   <div>

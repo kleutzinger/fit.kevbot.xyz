@@ -24,7 +24,7 @@ const workoutSchema = z.object({
   note: z.string().optional(),
   duration: z.coerce.number().default(0),
   distance: z.coerce.number().default(0),
-  watts: z.coerce.number().default(0),
+  energy: z.coerce.number().default(0),
   user_email: z.string(),
   machine_id: z.coerce.number().int(),
 });
@@ -40,7 +40,7 @@ const machineSchema = z.object({
   weight_active: z.coerce.number().int().default(0),
   duration_active: z.coerce.number().int().default(0),
   reps_active: z.coerce.number().int().default(0),
-  watts_active: z.coerce.number().int().default(0),
+  energy_active: z.coerce.number().int().default(0),
 });
 
 const userSchema = z.object({
@@ -100,13 +100,13 @@ function initUser(user_email) {
     { name: "Running", distance_active: true, duration_active: true },
     {
       name: "Rowing Machine",
-      watts_active: true,
+      energy_active: true,
       duration_active: true,
       distance_active: true,
     },
     {
       name: "Biking",
-      watts_active: true,
+      energy_active: true,
       duration_active: true,
       distance_active: true,
     },
@@ -116,7 +116,7 @@ function initUser(user_email) {
       reps_active: true,
       distance_active: true,
       duration_active: true,
-      watts_active: true,
+      energy_active: true,
     },
   ].map((vals, idx) => {
     const toInsert = machineSchema.parse({
@@ -134,9 +134,9 @@ const insertManyMachines = (machines) => {
   const insert = db.prepare(
     `INSERT INTO machines
             (name, datetime, user_email, display_order,
-             distance_active, weight_active, duration_active, reps_active, watts_active)
+             distance_active, weight_active, duration_active, reps_active, energy_active)
       VALUES (@name, @datetime, @user_email, @display_order,
-              @distance_active, @weight_active, @duration_active, @reps_active, @watts_active)
+              @distance_active, @weight_active, @duration_active, @reps_active, @energy_active)
       `,
   );
 
@@ -150,10 +150,10 @@ const insertManyWorkouts = (workouts) => {
     db.prepare(
       `INSERT INTO workouts
           (weight, reps, datetime, user_email, note, 
-           duration, distance, watts, machine_id)
+           duration, distance, energy, machine_id)
         VALUES
           (@weight, @reps, @datetime, @user_email, @note,
-            @duration, @distance, @watts, @machine_id)`,
+            @duration, @distance, @energy, @machine_id)`,
     ).run(workout);
   }
 };
@@ -188,7 +188,7 @@ const getWorkouts = (user_email, machine_id, limit) => {
       machines.reps_active AS reps_active,
       machines.duration_active AS duration_active,
       machines.distance_active AS distance_active,
-      machines.watts_active AS watts_active
+      machines.energy_active AS energy_active
     FROM workouts
     LEFT JOIN machines ON workouts.machine_id = machines.id
     WHERE workouts.user_email = ?

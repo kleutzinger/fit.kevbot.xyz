@@ -150,7 +150,7 @@ app.get("/workouts-table", (req, res) => {
       });
     const machine = getMachine(user_email, machine_id);
     const columns = ["ago", "note"];
-    for (const key of ["weight", "reps", "duration", "distance", "watts"]) {
+    for (const key of ["weight", "reps", "duration", "distance", "energy"]) {
       const key_a = `${key}_active`;
       const is_active = machine[key_a];
       if (is_active) {
@@ -185,7 +185,7 @@ app.post("/submit-workout", (req, res) => {
       !submitObj.reps &&
       !submitObj.duration &&
       !submitObj.distance &&
-      !submitObj.watts
+      !submitObj.energy
     ) {
       return res.send("Please fill out at least one field");
     }
@@ -206,7 +206,7 @@ app.post("/new-machine", (req, res) => {
   req.body.reps_active = req.body.reps_active == "on";
   req.body.duration_active = req.body.duration_active == "on";
   req.body.distance_active = req.body.distance_active == "on";
-  req.body.watts_active = req.body.watts_active == "on";
+  req.body.energy_active = req.body.energy_active == "on";
   const machine = machineSchema.parse(req.body);
   try {
     let serverResp = addMachine(user_email, machine);
