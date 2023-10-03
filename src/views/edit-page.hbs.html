@@ -39,12 +39,15 @@
     <label for="{{column.key}}">{{column.key}}</label>
     <br />
     {{/each}}
-    <button>submit update</button>
+    <button class="btn btn-blue">
+      submit update {{item.id}} {{item.name}}
+    </button>
   </form>
   <button
-    class="inline-flex"
+    class="btn btn-red"
     hx-post="/delete-{{../endpoint}}?id={{item.id}}"
     hx-swap="outerHTML"
+    hx-confirm="Are you sure you want to delete {{item.id}} {{item.name}}?"
     hx-target="#form-{{item.id}}"
   >
     delete {{item.id}} {{item.name}}

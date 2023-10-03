@@ -166,6 +166,7 @@
   <button
     class="btn btn-red my-20 py-12"
     hx-post="/delete-workout?id={{workout.id}}"
+    hx-confirm="Are you sure you want to delete this {{workout.machine_name}} workout?"
     hx-swap="innerHTML"
     hx-target="previous .output"
   >

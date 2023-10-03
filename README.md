@@ -93,8 +93,13 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
   - date_created
   - date_updated
 - [ ] fix auth0 using dev keys
+- [ ] make homepage 1 (or 2) db / network queries
 
 ## Graphs
+
+- [x] add alpinejs for some stuff
+- [ ] actually use alpinejs
+- [x] machine.column to display
 
 ## Rough UI
 

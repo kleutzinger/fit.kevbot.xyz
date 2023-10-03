@@ -98,12 +98,25 @@ function req2email(req) {
   return req?.oidc?.user?.email;
 }
 
-app.get("/machine-options", (req, res) => {
+app.get("/machine-name-options", (req, res) => {
   const user_email = req2email(req);
-  const machines = getMachineNames(user_email);
+  const machines = getMachines(user_email);
   res.send(
-    html`${machines.map((machine) => `<option>${machine}</option>`).join("")}`,
+    machines.map((i) => `<option value="${i.id}">${i.name}</option>`).join(""),
   );
+});
+
+app.get("/machine-column-options", (req, res) => {
+  const cols = [
+    "weight",
+    "note",
+    "datetime",
+    "reps",
+    "duration",
+    "distance",
+    "energy",
+  ];
+  res.send(cols.map((i) => `<option value="${i}">${i}</option>`).join(""));
 });
 
 app.get("/user-info", (req, res) => {
