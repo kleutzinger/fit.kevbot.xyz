@@ -3,8 +3,15 @@
   <button class="btn btn-blue" hx-swap="outerHTML" hx-get="/machine-links">
     Change Workout Group
   </button>
-  {{#each machine_ids as |machine_id|}} {{> workout-submit-and-table
-  machine_id=machine_id}} {{> line-break text='*' }} {{/each}}
+  {{#each machine_ids as |machine_id|}}
+  <div
+    class="full-workout-form grid grid-cols-1 justify-items-center"
+    hx-get="/full-workout-form?machine_id={{machine_id}}"
+    hx-trigger="load"
+    hx-replace="innerHTML"
+    hx-target="this"
+  ></div>
+  {{> line-break text='*' }} {{/each}}
 
   <p
     class="text-center"

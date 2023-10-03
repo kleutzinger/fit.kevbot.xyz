@@ -1,20 +1,16 @@
-{{#if htmx}}
-{{>htmx}}
-{{/if}}
 <p class="output max-w-xs" ></p>
-<div class="submit-div">
+<div>
 <form
-  id="workout-form-{{machine.id}}"
-  hx-post="{{endpoint}}"
+  hx-post="{{post_endpoint}}"
   hx-swap="innerHTML"
   hx-target="previous .output"
   hx-params="not machine_name"
 >
   <div>
-    {{#if workout}}
-    <p class="text-3xl">Edit {{machine.name}}</p>
+    {{#if edit}}
+    <p class="text-3xl">EDITING {{machine.name}}</p>
     {{else}}
-    <p class="text-3xl mb-2">Add Log: {{machine.name}}</p>
+    <p class="text-3xl mb-2">{{machine.name}}</p>
     {{/if}}
   </div>
   <input name="machine_id" hidden readonly value="{{machine.id}}"/>
@@ -147,8 +143,8 @@
     {{/if}}
     <div>
       <button class="mt-5 btn btn-blue">
-        {{#if workout}}
-        Submit Workout Update
+        {{#if edit}}
+        Submit Workout Edit
         {{else}}
         Submit Workout
         {{/if}}
@@ -156,21 +152,22 @@
     </div>
   </div>
 </form>
-{{#if workout}}
+{{#if edit}}
 <div>
   <button
-    class="btn btn-red my-20 py-12"
-    hx-get="/get-submit-workout-form/?machine_id={{workout.machine_id}}"
-    hx-swap="outerHTML"
-    hx-target="closest .submit-div"
+    class="btn btn-blue my-20 py-12"
+    hx-get="/full-workout-form?machine_id={{workout.machine_id}}"
+    hx-swap="innerHTML"
+    hx-target="closest .full-workout-form"
   >
-    CANCEL EDIT
+    Cancel Editing
   </button>
+    <br/>
   <button
     class="btn btn-red my-20 py-12"
     hx-post="/delete-workout?id={{workout.id}}"
-    hx-swap="outerHTML"
-    hx-target="closest .submit-div"
+    hx-swap="innerHTML"
+    hx-target="previous .output"
   >
     Delete Workout
   </button>

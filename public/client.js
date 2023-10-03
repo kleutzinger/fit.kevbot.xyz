@@ -3,13 +3,13 @@
 // https://htmx.org/api/#trigger
 // reload workouts when the page gets focus
 let firstFocus = true;
-addEventListener("focus", (event) => {
+addEventListener("focus", () => {
   // prevent double call on page load
   if (firstFocus) {
     firstFocus = false;
     return;
   }
-  htmx.trigger("#workout-table", "onFocus");
+  // htmx.trigger("#workout-table", "onFocus");
 });
 setTimeout(() => {
   firstFocus = false;

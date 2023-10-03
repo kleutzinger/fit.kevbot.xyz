@@ -1,0 +1,10 @@
+<div class="justify-items-center">
+  {{>workout-form machine=machine workout=workout edit=edit
+  post_endpoint=post_endpoint}}
+</div>
+{{#if include_table}}
+<div>
+  {{>workout-table workouts=workouts edit_workout_id=edit_workout_id
+  machine=machine columns=columns table_limit=table_limit}}
+</div>
+{{/if}}

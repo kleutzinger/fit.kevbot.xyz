@@ -77,7 +77,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] alphabetical sort on machine selection
 - [ ] https://htmx.org/extensions/response-targets/
 - refactor workout template
-  - [ ] make a single get-workouter endpoint
+  - [x] make a single full-workout-form endpoint
   - [ ] table and table.limit as params
   - [ ] it gets you a table and a form
   - [ ] highlight the entry in the table that we are editing
@@ -92,6 +92,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
   - machine_ids? TEXT "1,2,3,4"
   - date_created
   - date_updated
+- [ ] fix auth0 using dev keys
 
 ## Graphs
 
@@ -125,3 +126,5 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - I should try to use drizzle next time
 - CRUD is always(?) annoying
 - sqlite works nicely
+
+https://htmx.org/docs/#request-operations

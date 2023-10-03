@@ -19,7 +19,7 @@ const base_url = process.env.BASE_URL || `http://localhost:${port}`;
 const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
 import { create } from "express-handlebars";
 const hbs = create({
-  defaultLayout: "page",
+  defaultLayout: "bare",
   extname: ".hbs.html",
   helpers: {
     ifeq: function (a, b, options) {
@@ -73,7 +73,7 @@ const auth0Config = {
 
 // redirect here if not authenticated
 app.get("/signup", (_, res) => {
-  res.render("signup", { nonavbar: true });
+  res.render("signup", { layout: "page", nonavbar: true });
 });
 
 // Middleware to check if user is authenticated
@@ -107,7 +107,7 @@ app.get("/machine-options", (req, res) => {
 });
 
 app.get("/user-info", (req, res) => {
-  res.render("user-info", { layout: "bare", user: req.oidc.user });
+  res.render("user-info", { user: req.oidc.user });
 });
 
 app.get("/user-email", (req, res) => {
@@ -137,18 +137,28 @@ app.get("/download-json", (req, res) => {
   res.json(jsonText);
 });
 
-app.get("/workout-table", (req, res) => {
+app.get("/full-workout-form", (req, res) => {
   try {
-    const { limit } = req.query;
     const user_email = req2email(req);
     const machine_id = req.query?.machine_id;
-    const workouts = getWorkouts(user_email, machine_id, limit)
-      .slice(0, limit)
-      .map((workout) => {
-        workout.ago = timeAgo.format(new Date(workout.datetime), "mini");
-        return workout;
-      });
+    const include_table = req.query?.include_table || true;
+    const edit_workout_id = req.query?.edit_workout_id;
+    const edit = req.query?.edit == "true";
+    const table_limit = 5;
+    const post_endpoint = edit
+      ? `/update-workout/${edit_workout_id}`
+      : "/submit-new-workout";
     const machine = getMachine(user_email, machine_id);
+    if (!machine) {
+      throw new Error(
+        `No machine found with id "${machine_id}" and email "${user_email}"`,
+      );
+    }
+    const workouts = getWorkouts(user_email, machine_id);
+    const workout =
+      edit_workout_id != undefined &&
+      workouts.find((i) => i.id == edit_workout_id);
+
     const columns = ["ago", "note"];
     for (const key of ["weight", "reps", "duration", "distance", "energy"]) {
       const key_a = `${key}_active`;
@@ -158,14 +168,24 @@ app.get("/workout-table", (req, res) => {
       } else {
       }
     }
-    res.render("workout-table", { layout: "bare", workouts, columns, machine });
+    res.render("full-workout-form", {
+      workouts,
+      workout,
+      edit,
+      post_endpoint,
+      edit_workout_id,
+      table_limit,
+      columns,
+      machine,
+      include_table,
+    });
   } catch (err) {
     console.error(err);
-    res.send(JSON.stringify(err));
+    res.send(err.message);
   }
 });
 
-app.post("/submit-workout", (req, res) => {
+app.post("/submit-new-workout", (req, res) => {
   const user_email = req2email(req);
   req.body.datetime = new Date().toISOString();
   req.body.user_email = user_email;
@@ -306,6 +326,7 @@ app.get("/edit-machines", (req, res) => {
   const user_email = req2email(req);
   const columns = zodSchemaToEditColumns(machineSchema);
   res.render("edit-page", {
+    layout: "page",
     user: req.oidc.user,
     items: getMachines(user_email),
     endpoint: "machine",
@@ -313,66 +334,13 @@ app.get("/edit-machines", (req, res) => {
   });
 });
 
-app.get("/get-submit-workout-form", (req, res) => {
-  const user_email = req2email(req);
-  const machine_id = req.query?.machine_id;
-  const all_machines = getMachines(user_email);
-  let machine;
-  if (machine_id == undefined) {
-    machine = all_machines[0];
-  } else {
-    machine = all_machines.find((i) => i.id == machine_id);
-  }
-  if (!machine) {
-    return res.send(
-      `<a href="/">back</a><br/>No machine found with that id: ${machine_id}`,
-    );
-  }
-  res.render("submit-workout-form", {
-    layout: "bare",
-    user: req.oidc.user,
-    machine,
-    endpoint: "/submit-workout",
-    all_machines,
-  });
-});
-
-app.get("/get-edit-workout-form/:id", (req, res) => {
-  const user_email = req2email(req);
-  const workout = getWorkouts(user_email).find((i) => i.id == req.params?.id);
-  if (!workout) {
-    return res.send(`<a href="/">back</a><br/>No workout found with that id`);
-  }
-  const machine_id = workout.machine_id;
-  const all_machines = getMachines(user_email);
-  let machine;
-  if (machine_id == undefined) {
-    machine = all_machines[0];
-  } else {
-    machine = all_machines.find((i) => i.id == machine_id);
-  }
-  if (!machine) {
-    return res.send(
-      `<a href="/">back</a><br/>No machine found with that id: ${machine_id}`,
-    );
-  }
-  res.render("submit-workout-form", {
-    layout: "bare",
-    endpoint: `/update-workout/${workout.id}`,
-    user: req.oidc.user,
-    machine,
-    workout,
-    all_machines,
-  });
-});
-
 app.get("/admin", (_, res) => {
-  res.render("admin");
+  res.render("admin", { layout: "page" });
 });
 
 app.get("/graph", (req, res) => {
   initUser(req2email(req));
-  res.render("graph");
+  res.render("graph", { layout: "page" });
 });
 
 app.get("/machine-links", (req, res) => {
@@ -411,7 +379,7 @@ app.get("/", (req, res) => {
       .join(",");
     res.redirect("/?machine_ids=" + machine_ids);
   }
-  res.render("index", { user: req.oidc.user, machine_ids });
+  res.render("index", { layout: "page", user: req.oidc.user, machine_ids });
 });
 
 app.listen(port, () => {
