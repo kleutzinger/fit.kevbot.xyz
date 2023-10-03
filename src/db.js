@@ -273,13 +273,16 @@ function getJSON(user_email) {
 }
 
 function deleteWorkout(id, user_email) {
+  const machine_id = db
+    .prepare("SELECT machine_id FROM workouts WHERE id = ? AND user_email = ?")
+    .get(id, user_email).machine_id;
   const out = db
     .prepare("DELETE FROM workouts WHERE id = ? AND user_email = ?")
     .run(id, user_email);
   if (out.changes === 0) {
     throw new Error("No workout found with that id and email");
   }
-  return "success";
+  return { message: "success", machine_id };
 }
 
 function deleteMachine(id, user_email) {

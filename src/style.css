@@ -2,24 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* make background of document black */
-
-/** make everything really big for mobile **/
-
 @layer base {
-  a {
-    @apply text-blue-900;
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
   }
 }
 
 input,
 select {
   @apply text-center;
-  @apply mb-3;
-}
-
-body {
-  background-image: url("/bg.png");
 }
 
 .btn {
@@ -28,7 +22,11 @@ body {
   @apply px-4;
   @apply my-2;
   @apply rounded;
+  @apply border-solid;
+  @apply border-2;
+  @apply border-sky-500;
 }
+
 .btn-blue {
   @apply bg-blue-500 text-white;
 }

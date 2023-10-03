@@ -15,7 +15,7 @@
       {{/each}}
       <td>
         <a
-          hx-target="#workout-form"
+          hx-target="previous #workout-form-{{workout.machine_id}}"
           hx-get="/get-edit-workout-form/{{workout.id}}"
           hx-trigger="click"
           >edit</a

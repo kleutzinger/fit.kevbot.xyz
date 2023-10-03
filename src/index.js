@@ -72,8 +72,8 @@ const auth0Config = {
 // no auth required for these routes
 
 // redirect here if not authenticated
-app.get("/signup", (req, res) => {
-  res.render("signup", { layout: "bare" });
+app.get("/signup", (_, res) => {
+  res.render("signup", { nonavbar: true });
 });
 
 // Middleware to check if user is authenticated
@@ -137,7 +137,7 @@ app.get("/download-json", (req, res) => {
   res.json(jsonText);
 });
 
-app.get("/workouts-table", (req, res) => {
+app.get("/workout-table", (req, res) => {
   try {
     const { limit } = req.query;
     const user_email = req2email(req);
@@ -158,7 +158,7 @@ app.get("/workouts-table", (req, res) => {
       } else {
       }
     }
-    res.render("workout-table", { layout: "bare", workouts, columns });
+    res.render("workout-table", { layout: "bare", workouts, columns, machine });
   } catch (err) {
     console.error(err);
     res.send(JSON.stringify(err));
@@ -190,7 +190,8 @@ app.post("/submit-workout", (req, res) => {
       return res.send("Please fill out at least one field");
     }
     const serverResp = addWorkout(submitObj);
-    res.setHeader("HX-Trigger", "workout-modified");
+    const machine_id = submitObj.machine_id;
+    res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
     console.error(err);
@@ -234,8 +235,9 @@ app.post("/update-workout/:id", (req, res) => {
     }
     const newWorkout = workoutSchema.parse(req.body);
     newWorkout.id = workout_id;
+    const machine_id = newWorkout.machine_id;
     const serverResp = updateDBItem("workouts", newWorkout);
-    res.setHeader("HX-Trigger", "workout-modified");
+    res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
     console.error(err);
@@ -263,7 +265,8 @@ app.post("/delete-workout", (req, res) => {
     const user_email = req2email(req);
     const workout_id = req?.query?.id;
     const serverResp = deleteWorkout(workout_id, user_email);
-    res.setHeader("HX-Trigger", "workout-modified");
+    const machine_id = serverResp.machine_id;
+    res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
     console.error(err);
@@ -375,14 +378,14 @@ app.get("/graph", (req, res) => {
 app.get("/machine-links", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachines(user_email);
-  res.send(
-    html`${machines
-      .map(
-        (machine) =>
-          `<a href="/?machine_id=${machine.id}"><button class="btn btn-blue">${machine.name}</button></a>`,
-      )
-      .join("")}`,
-  );
+  const machines2link = (machines, name) => {
+    return `<a href="/?machine_ids=${machines
+      .map((m) => "" + m.id)
+      .join(",")}"><button class="btn btn-blue">${name}</button></a>`;
+  };
+  const univLink = machines2link(machines, "All Machines");
+  const indivLinks = machines.map((m) => machines2link([m], m.name)).join("");
+  res.send(html`${univLink}${indivLinks}`);
 });
 
 app.get("/machine-selection", (req, res) => {
@@ -401,12 +404,14 @@ app.get("/machine-selection", (req, res) => {
 app.get("/", (req, res) => {
   const user_email = req2email(req);
   initUser(user_email);
-  let machine_id = req.query?.machine_id;
-  if (machine_id == undefined) {
-    machine_id = getMachines(user_email)[0]?.id;
-    res.redirect("/?machine_id=" + machine_id);
+  let machine_ids = req.query?.machine_ids?.split(",") || [];
+  if (machine_ids.length === 0) {
+    machine_ids = getMachines(user_email)
+      .map((i) => i.id)
+      .join(",");
+    res.redirect("/?machine_ids=" + machine_ids);
   }
-  res.render("index", { user: req.oidc.user, machine_id });
+  res.render("index", { user: req.oidc.user, machine_ids });
 });
 
 app.listen(port, () => {

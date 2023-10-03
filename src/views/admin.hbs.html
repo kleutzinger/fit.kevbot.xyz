@@ -1,7 +1,7 @@
 <div class="container mx-auto p-5">
-  <a href="/logout">log out</a>
-  <a href="/download-csv">download-csv</a>
-  <a href="/download-json">download-json</a>
+  <a class="btn btn-red" href="/logout">log out</a>
+  <a class="btn btn-blue" href="/download-csv">download-csv</a>
+  <a class="btn btn-blue" href="/download-json">download-json</a>
   <div hx-get="/user-info" hx-replace="this" hx-trigger="load"></div>
   <p id="output"></p>
 </div>

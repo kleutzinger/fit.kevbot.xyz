@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <title>Kevin's workout tracker</title>
     <meta
@@ -8,10 +8,11 @@
     />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/style.css" rel="stylesheet" />
     {{> htmx}}
   </head>
   <body>
-    {{> navbar}}
+    {{#if nonavbar}} <span></span> {{else}} {{> navbar}} {{/if}}
     <div class="container">
       <div class="row">
         <div class="col-md-12">{{{body}}}</div>
