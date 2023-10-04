@@ -18,3 +18,8 @@ input,
 select {
   @apply text-center;
 }
+
+.edit-icon {
+  display: inline-block;
+  transform: rotateZ(90deg);
+}

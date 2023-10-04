@@ -15,12 +15,12 @@
       {{/each}}
       <td>
         <a
-          class="cursor-pointer"
+          class="cursor-pointer edit-icon"
           hx-target="closest .full-workout-form"
           hx-swap="innerHTML"
           hx-get="/full-workout-form?machine_id={{workout.machine_id}}&edit=true&edit_workout_id={{workout.id}}&table_limit={{table_limit}}"
           hx-trigger="click"
-          >edit</a
+          >&#9998;</a
         >
       </td>
     </tr>
