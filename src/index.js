@@ -167,7 +167,10 @@ app.get("/full-workout-form", (req, res) => {
         `No machine found with id "${machine_id}" and email "${user_email}"`,
       );
     }
-    const workouts = getWorkouts(user_email, machine_id);
+    const workouts = getWorkouts(user_email, machine_id).map((w) => {
+      w.ago = timeAgo.format(new Date(w.datetime), "mini-minute");
+      return w;
+    });
     const workout =
       edit_workout_id != undefined &&
       workouts.find((i) => i.id == edit_workout_id);
@@ -230,6 +233,12 @@ app.post("/submit-new-workout", (req, res) => {
     console.error(err);
     res.send(err?.issues);
   }
+});
+
+app.get("/refresh-table", (req, res) => {
+  const machine_id = req.query?.machine_id;
+  res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
+  res.send("ok");
 });
 
 app.post("/new-machine", (req, res) => {

@@ -1,4 +1,4 @@
-<p class="output max-w-xs" ></p>
+<p class="output max-w-xs"></p>
 <div>
 <form
   hx-post="{{post_endpoint}}"
@@ -19,7 +19,7 @@
     <input
       name="weight"
       id="weight"
-      class="bg-red-200"
+      class="bg-red-200 input input-bordered w-full max-w-xs"
       autocomplete="off"
       inputmode="numeric"
       {{#if workout}}
@@ -35,7 +35,7 @@
     <input
       name="energy"
       id="energy"
-      class="bg-red-200"
+      class="bg-red-200 input input-bordered w-full max-w-xs"
       autocomplete="off"
       inputmode="numeric"
       type="text"
@@ -51,7 +51,7 @@
       name="reps"
       id="reps"
       autocomplete="off"
-      class="bg-green-200"
+      class="bg-green-200 input input-bordered w-full max-w-xs"
       inputmode="numeric"
       type="text"
       {{#if workout}}
@@ -66,7 +66,7 @@
       name="distance"
       id="distance"
       autocomplete="off"
-      class="bg-green-200"
+      class="bg-green-200 input input-bordered w-full max-w-xs"
       inputmode="numeric"
       type="text"
       {{#if workout}}
@@ -87,7 +87,7 @@
           {{#if workout}}
           hidden readonly
           {{/if}}
-          class="bg-purple-200 w-20"
+          class="bg-purple-200 input input-bordered w-20"
         />
         <label for="duration">:</label>
         <input
@@ -96,7 +96,7 @@
           autocomplete="off"
           inputmode="numeric"
           placeholder="0"
-          class="bg-purple-200 w-20"
+          class="bg-purple-200 input input-bordered w-20"
           {{#if workout}}
           hidden readonly
           {{/if}}
@@ -108,7 +108,7 @@
           autocomplete="off"
           inputmode="numeric"
           placeholder="0"
-          class="bg-purple-200 w-20"
+          class="bg-purple-200 input input-bordered w-20"
           {{#if workout}}
           value="{{workout.duration}}"
           {{/if}}
@@ -120,7 +120,7 @@
         name="note"
         id="note"
         autocomplete="off"
-        class="bg-blue-200"
+        class="bg-blue-200 input input-bordered w-full max-w-xs"
         type="textarea"
         {{#if workout}}
         value="{{workout.note}}"
@@ -134,7 +134,7 @@
       name="datetime"
       id="datetime"
       autocomplete="off"
-      class="bg-blue-200"
+      class="bg-blue-200 input input-bordered w-full max-w-xs"
       type="text"
       value="{{workout.datetime}}"
     />
@@ -155,16 +155,15 @@
 {{#if edit}}
 <div>
   <button
-    class="btn btn-blue my-20 py-12"
-    hx-get="/full-workout-form?machine_id={{workout.machine_id}}"
-    hx-swap="innerHTML"
-    hx-target="closest .full-workout-form"
+    class="btn"
+    hx-get="/refresh-table?machine_id={{workout.machine_id}}"
+    hx-target="none"
   >
     Cancel Editing
   </button>
     <br/>
   <button
-    class="btn btn-red my-20 py-12"
+    class="btn btn-warning"
     hx-post="/delete-workout?id={{workout.id}}"
     hx-confirm="Are you sure you want to delete this {{workout.machine_name}} workout?"
     hx-swap="innerHTML"

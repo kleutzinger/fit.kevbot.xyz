@@ -18,28 +18,3 @@ input,
 select {
   @apply text-center;
 }
-
-.btn {
-  @apply font-bold;
-  @apply py-2;
-  @apply px-4;
-  @apply my-2;
-  @apply rounded;
-  @apply border-solid;
-  @apply border-2;
-  @apply border-sky-500;
-}
-
-.btn-blue {
-  @apply bg-blue-500 text-white;
-}
-.btn-blue:hover {
-  @apply bg-blue-700;
-}
-
-.btn-red {
-  @apply bg-red-500 text-white;
-}
-.btn-red:hover {
-  @apply bg-red-700;
-}

@@ -1,13 +1,14 @@
-<span>
-  <a href="/">home</a>
-  <span>|</span>
-  <a href="/graph">graph</a>
-  <span>|</span>
-  <a href="/admin">admin</a>
-  <span>|</span>
-  <a href="/edit-machines">edit workout types</a>
-  <span>|</span>
-  <a href="/logout">logout</a>
-  <span>|</span>
-  <span hx-get="/user-email" hx-trigger="load"></span>
-</span>
+<div class="navbar bg-base-100">
+  <a href="/" class="btn btn-ghost normal-case text">home</a>
+  <a href="/graph" class="btn btn-ghost normal-case text">graph</a>
+  <a href="/admin" class="btn btn-ghost normal-case text">admin</a>
+  <a href="/edit-machines" class="btn btn-ghost normal-case text"
+    >edit workout types</a
+  >
+  <a href="/logout" class="btn btn-ghost normal-case text">logout</a>
+  <span
+    class="btn btn-ghost normal-case text"
+    hx-get="/user-email"
+    hx-trigger="load"
+  ></span>
+</div>
