@@ -16,6 +16,10 @@
   <input name="machine_id" hidden readonly value="{{machine.id}}"/>
   <div>
     {{#if machine.weight_active}}
+
+   <label class="label" for="weight">
+      <span class="label-text">Weight</span>
+    </label>
     <input
       name="weight"
       id="weight"
@@ -27,11 +31,13 @@
       {{/if}}
       type="text"
     />
-    <label for="weight">Weight</label>
     {{/if}}
   </div>
   {{#if machine.energy_active}}
   <div>
+    <label class="label" for="energy">
+      <span class="label-text">Energy</span>
+    </label>
     <input
       name="energy"
       id="energy"
@@ -43,10 +49,12 @@
       value="{{workout.energy}}"
       {{/if}}
     />
-    <label for="energy">Energy</label>
   </div>
   {{/if}} {{#if machine.reps_active}}
   <div>
+    <label class="label" for="reps">
+      <span class="label-text">Reps</span>
+    </label>
     <input
       name="reps"
       id="reps"
@@ -58,10 +66,12 @@
       value="{{workout.reps}}"
       {{/if}}
     />
-    <label for="reps">Reps</label>
   </div>
   {{/if}} {{#if machine.distance_active}}
   <div>
+    <label class="label" for="distance">
+      <span class="label-text">Distance</span>
+    </label>
     <input
       name="distance"
       id="distance"
@@ -73,49 +83,50 @@
       value="{{workout.distance}}"
       {{/if}}
     />
-    <label for="distance">Distance</label>
     <div>
       {{/if}} {{#if machine.duration_active}}
       <div>
-        <p>Duration (H:M:S):</p>
+        <label class="label" for="duration_">
+          <span class="label-text">Duration</span>
+        </label>
         <input
           name="duration_h"
           id="duration_h"
           autocomplete="off"
           inputmode="numeric"
-          placeholder="0"
+          placeholder="h"
           {{#if workout}}
           hidden readonly
           {{/if}}
           class="bg-purple-200 input input-bordered w-20"
         />
-        <label for="duration">:</label>
         <input
           name="duration_m"
           id="duration_m"
           autocomplete="off"
           inputmode="numeric"
-          placeholder="0"
+          placeholder="m"
           class="bg-purple-200 input input-bordered w-20"
           {{#if workout}}
           hidden readonly
           {{/if}}
         />
-        <label for="duration">:</label>
         <input
           name="duration_s"
           id="duration_s"
           autocomplete="off"
           inputmode="numeric"
-          placeholder="0"
+          placeholder="s"
           class="bg-purple-200 input input-bordered w-20"
           {{#if workout}}
           value="{{workout.duration}}"
           {{/if}}
         />
-        <label for="duration_s">Sec</label>
       </div>
       {{/if}}
+      <label class="label" for="note">
+        <span class="label-text">Note</span>
+      </label>
       <input
         name="note"
         id="note"
@@ -126,7 +137,6 @@
         value="{{workout.note}}"
         {{/if}}
       />
-      <label for="note">Note</label>
     </div>
     {{#if workout}}
     <div>
@@ -142,7 +152,7 @@
     </div>
     {{/if}}
     <div>
-      <button class="mt-5 btn btn-blue">
+      <button class="mt-5 btn btn-secondary">
         {{#if edit}}
         Submit Workout Edit
         {{else}}

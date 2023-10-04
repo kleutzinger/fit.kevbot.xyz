@@ -12,6 +12,9 @@
   a {
     @apply text-blue-500;
   }
+  input {
+    @apply p-2;
+  }
 }
 
 input,
