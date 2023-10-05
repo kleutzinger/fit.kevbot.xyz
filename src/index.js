@@ -9,6 +9,7 @@ import express from "express";
 import tracer from "tracer";
 const logger = tracer.colorConsole();
 const log = logger.log;
+import { d, isElement } from "./hyperscript-helper.js";
 
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
@@ -72,7 +73,19 @@ const auth0Config = {
   issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
 };
 
-// no auth required for these routes
+const htmlElementMiddleware = (req, res, next) => {
+  const originalSend = res.send;
+
+  res.send = function (body) {
+    if (isElement(body)) {
+      body = body.outerHTML;
+    }
+    originalSend.call(this, body);
+  };
+  next();
+};
+
+app.use(htmlElementMiddleware);
 
 // redirect here if not authenticated
 app.get("/signup", (_, res) => {
@@ -105,7 +118,7 @@ app.get("/machine-name-options", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachines(user_email);
   res.send(
-    machines.map((i) => `<option value="${i.id}">${i.name}</option>`).join(""),
+    machines.map((m) => d.option({ value: m.id }, m.name).outerHTML).join(""),
   );
 });
 
@@ -389,27 +402,19 @@ app.get("/graph", (req, res) => {
 
 app.get("/machine-links", (req, res) => {
   const user_email = req2email(req);
-  const machines = getMachines(user_email);
-  const machines2link = (machines, name) => {
-    return `<a href="/?machine_ids=${machines
-      .map((m) => "" + m.id)
-      .join(",")}"><button class="btn btn-blue">${name}</button></a>`;
-  };
-  const univLink = machines2link(machines, "All Machines");
-  const indivLinks = machines.map((m) => machines2link([m], m.name)).join("");
-  res.send(html`${univLink}${indivLinks}`);
-});
-
-app.get("/machine-selection", (req, res) => {
-  const user_email = req2email(req);
-  const machines = getMachines(user_email);
+  const machines = [
+    { id: "all", name: "All Machines" },
+    ...getMachines(user_email),
+  ];
   res.send(
-    html`${machines
-      .map(
-        (machine) =>
-          `<a href="/?machine_id=${machine.id}"><button class="btn btn-blue">${machine.name}</button></a>`,
-      )
-      .join("")}`,
+    d.html(
+      machines.map((m) =>
+        d.a(
+          { href: `/?machine_ids=${m.id}` },
+          d.button({ class: "btn btn-primary" }, m.name),
+        ),
+      ),
+    ),
   );
 });
 
@@ -417,7 +422,7 @@ app.get("/", (req, res) => {
   const user_email = req2email(req);
   initUser(user_email);
   let machine_ids = req.query?.machine_ids?.split(",") || [];
-  if (machine_ids.length === 0) {
+  if (machine_ids.length === 0 || machine_ids.includes("all")) {
     machine_ids = getMachines(user_email)
       .map((i) => i.id)
       .join(",");
