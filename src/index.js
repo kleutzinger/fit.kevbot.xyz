@@ -70,6 +70,26 @@ const auth0Config = {
   baseURL: base_url,
   clientID: "wILIKtGWGdGjw83OQoxrvCXdqKJy97LX",
   issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
+  routes: {
+    callback: "/custom-callback",
+  },
+};
+// Middleware to check if user is authenticated
+const unauthorizedToSignup = (req, res, next) => {
+  if (!req.oidc.isAuthenticated() && !NO_AUTH) {
+    // Redirect unauthenticated users to the signup page
+    return res.redirect("/signup");
+  }
+
+  // Check if email is verified
+  const emailVerified = req.oidc.user.email_verified;
+
+  if (!emailVerified) {
+    // Redirect to a page to prompt the user to verify their email
+    return res.redirect("/verify-email");
+  }
+
+  next();
 };
 
 // no auth required for these routes
@@ -79,22 +99,37 @@ app.get("/signup", (_, res) => {
   res.render("signup", { layout: "page", nonavbar: true });
 });
 
-// Middleware to check if user is authenticated
-const unauthorizedToSignup = (req, res, next) => {
-  if (!req.oidc.isAuthenticated() && !NO_AUTH) {
-    // Redirect unauthenticated users to the signup page
-    return res.redirect("/signup");
-  }
-  next();
-};
-
-app.use(express.static(join(__dirname, "..", "public")));
-
-// auth required everything below
+app.get("/verify-email", (req, res) => {
+  res.send("Please verify your email, " + JSON.stringify(req.oidc.user));
+});
+// Your existing middleware and routes
 app.use(auth(auth0Config));
 
-// apply checkAuth to all routes
+// Apply checkAuth to all routes
 app.use(unauthorizedToSignup);
+
+// Custom callback route
+app.get("/custom-callback", async (req, res, next) => {
+  try {
+    await req.oidc.callback();
+    const emailVerified = req.oidc.user.email_verified;
+
+    if (!emailVerified) {
+      // Redirect to a page to prompt the user to verify their email
+      return res.redirect("/verify-email");
+    }
+
+    // Continue with your application logic
+    // ...
+
+    // Redirect to a success page or the home page
+    res.redirect("/");
+  } catch (err) {
+    // Handle errors
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 function req2email(req) {
   if (NO_AUTH) return "NOAUTH@fake.com";
