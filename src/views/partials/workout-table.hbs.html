@@ -1,8 +1,9 @@
+<div class="overflow-x-auto overflow-visible">
 <table class="table-fixed">
   <thead>
     <tr>
       {{#each columns}}
-      <th scope="col" class="text-lg px-4 py4">{{this}}</th>
+      <th scope="col" class="transform -rotate-45 text-white">{{this}}</th>
       {{/each}}
       <th scope="col" class="text-lg px-4 py4">edit</th>
     </tr>
@@ -27,6 +28,9 @@
           hx-swap="innerHTML"
           hx-get="/full-workout-form?machine_id={{workout.machine_id}}&edit=true&edit_workout_id={{workout.id}}&table_limit={{table_limit}}"
           hx-trigger="click"
+          {{#if ../edit_workout_id}}
+          disabled
+          {{/if}}
           >&#9998;</a
         >
       </td>
@@ -34,3 +38,4 @@
     {{/each}}
   </tbody>
 </table>
+</div>

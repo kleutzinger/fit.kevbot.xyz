@@ -12,7 +12,7 @@
     "prestart": "npm run init-db",
     "test": "node test/test.js",
     "build": "tailwindcss -i ./src/style.css -o ./public/style.css --minify",
-    "dev": "concurrently \"npm:watch-node\" \"npm:watch-tailwind\"",
+    "dev": "concurrently --raw \"npm:watch-node\" \"npm:watch-tailwind\"",
     "init-db": "node src/init-db.js",
     "watch-node": "nodemon src/index.js",
     "watch-tailwind": "tailwindcss -i ./src/style.css -o ./public/style.css --watch"
@@ -34,6 +34,7 @@
     "migration-files": "^0.4.1",
     "nightwind": "^1.1.13",
     "run-func": "^3.0.0",
+    "tracer": "^1.2.0",
     "zod": "^3.22.2"
   },
   "devDependencies": {

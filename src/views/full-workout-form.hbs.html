@@ -10,9 +10,9 @@
     post_endpoint=post_endpoint}}
   </div>
   {{#if include_table}}
-  <div>
-    {{>workout-table workouts=workouts edit_workout_id=edit_workout_id
-    machine=machine columns=columns table_limit=table_limit}}
-  </div>
+  <!-- This is the table that will be swapped out -->
+  {{>workout-table workouts=workouts edit_workout_id=edit_workout_id
+  machine=machine columns=columns table_limit=table_limit}}
+  <!-- This is the table that will be swapped out -->
   {{/if}}
 </div>

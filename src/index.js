@@ -6,8 +6,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import express from "express";
+import tracer from "tracer";
+const logger = tracer.colorConsole();
+const log = logger.log;
+
 import TimeAgo from "javascript-time-ago";
-// English.
 import en from "javascript-time-ago/locale/en.json";
 TimeAgo.addDefaultLocale(en);
 
@@ -167,8 +170,27 @@ app.get("/full-workout-form", (req, res) => {
         `No machine found with id "${machine_id}" and email "${user_email}"`,
       );
     }
+    const longToShort = {
+      distance: "dist",
+      weight: "wt",
+      reps: "reps",
+      duration: "dur",
+      energy: "en",
+    };
     const workouts = getWorkouts(user_email, machine_id).map((w) => {
       w.ago = timeAgo.format(new Date(w.datetime), "mini-minute");
+      // add longToShort keys and copy values
+      for (const [long, short] of Object.entries(longToShort)) {
+        // convert duration to h:m:s
+        if (long == "duration") {
+          const h = Math.floor(w[long] / 3600);
+          const m = Math.floor((w[long] % 3600) / 60);
+          const s = Math.floor(w[long] % 60);
+          // only show hours if > 0, always show minutes, always show seconds
+          w[long] = `${h > 0 ? h + "h" : ""}${m}m${s}s`;
+        }
+        w[short] = w[long];
+      }
       return w;
     });
     const workout =
@@ -176,11 +198,11 @@ app.get("/full-workout-form", (req, res) => {
       workouts.find((i) => i.id == edit_workout_id);
 
     const columns = ["ago", "note"];
-    for (const key of ["weight", "reps", "duration", "distance", "energy"]) {
-      const key_a = `${key}_active`;
+    for (const [long, short] of Object.entries(longToShort)) {
+      const key_a = `${long}_active`;
       const is_active = machine[key_a];
       if (is_active) {
-        columns.push(key);
+        columns.push(short);
       } else {
       }
     }
