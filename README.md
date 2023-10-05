@@ -78,12 +78,11 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] https://htmx.org/extensions/response-targets/
 - refactor workout template
   - [x] make a single full-workout-form endpoint
-  - [ ] table and table.limit as params
-  - [ ] it gets you a table and a form
-  - [ ] highlight the entry in the table that we are editing
-  - [ ] maybe I also want a way to get just the talbe?
-  - [ ] re-work the workout-submit-and-table partial?. basically, instead of a partial, just make an endpoint?
-  - [ ] refresh button?
+  - [x] table and table.limit as params
+  - [x] it gets you a table and a form
+  - [x] highlight the entry in the table that we are editing
+  - [x] maybe I also want a way to get just the talbe?
+  - [x] re-work the workout-submit-and-table partial?. basically, instead of a partial, just make an endpoint?
 - [ ] save machine groups to the db (TEXT machine_id_list "12,34,53")
 - [ ] new table machine_groups
   - id int
@@ -94,6 +93,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
   - date_updated
 - [ ] fix auth0 using dev keys
 - [ ] make homepage 1 (or 2) db / network queries
+- [x] fix /signup page!
 
 ## Graphs
 
