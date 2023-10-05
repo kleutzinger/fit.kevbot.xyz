@@ -2,21 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  h1 {
-    @apply text-2xl;
-  }
-  h2 {
-    @apply text-xl;
-  }
-  a {
-    @apply text-blue-500;
-  }
-  input {
-    @apply p-2;
-  }
-}
-
 input,
 select {
   @apply text-center;

@@ -4,8 +4,13 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms"), require("daisyui")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/forms"),
+    require("daisyui"),
+  ],
   daisyui: {
     logs: false,
+    themes: ["dracula"],
   },
 };

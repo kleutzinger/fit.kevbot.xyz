@@ -1,8 +1,14 @@
 <script src="/client.js"></script>
 <div class="grid grid-cols-1 justify-items-center p-8">
-  <button class="btn btn-blue" hx-swap="outerHTML" hx-get="/machine-links">
-    Change Workout Group
-  </button>
+  <div class="py-4">
+    <button
+      class="btn btn-primary -10"
+      hx-swap="outerHTML"
+      hx-get="/machine-links"
+    >
+      Change Workout Group
+    </button>
+  </div>
   {{#each machine_ids as |machine_id|}}
   <div
     class="full-workout-form grid grid-cols-1 justify-items-center"

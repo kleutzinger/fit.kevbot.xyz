@@ -23,7 +23,7 @@
     <input
       name="weight"
       id="weight"
-      class="bg-red-200 input input-bordered w-full max-w-xs"
+      class="input input-bordered input-primary w-full max-w-xs"
       autocomplete="off"
       inputmode="numeric"
       {{#if workout}}
@@ -41,7 +41,7 @@
     <input
       name="energy"
       id="energy"
-      class="bg-red-200 input input-bordered w-full max-w-xs"
+      class="input input-bordered input-primary w-full max-w-xs"
       autocomplete="off"
       inputmode="numeric"
       type="text"
@@ -59,7 +59,7 @@
       name="reps"
       id="reps"
       autocomplete="off"
-      class="bg-green-200 input input-bordered w-full max-w-xs"
+      class="input input-bordered input-accent w-full max-w-xs"
       inputmode="numeric"
       type="text"
       {{#if workout}}
@@ -76,7 +76,7 @@
       name="distance"
       id="distance"
       autocomplete="off"
-      class="bg-green-200 input input-bordered w-full max-w-xs"
+      class="input input-bordered input-accent w-full max-w-xs"
       inputmode="numeric"
       type="text"
       {{#if workout}}
@@ -98,7 +98,7 @@
           {{#if workout}}
           hidden readonly
           {{/if}}
-          class="bg-purple-200 input input-bordered w-20"
+          class="input input-bordered input-accent w-20"
         />
         <input
           name="duration_m"
@@ -106,7 +106,7 @@
           autocomplete="off"
           inputmode="numeric"
           placeholder="m"
-          class="bg-purple-200 input input-bordered w-20"
+          class="input input-bordered input-accent w-20"
           {{#if workout}}
           hidden readonly
           {{/if}}
@@ -117,7 +117,7 @@
           autocomplete="off"
           inputmode="numeric"
           placeholder="s"
-          class="bg-purple-200 input input-bordered w-20"
+          class="input input-bordered input-accent w-20"
           {{#if workout}}
           value="{{workout.duration}}"
           {{/if}}
@@ -131,7 +131,7 @@
         name="note"
         id="note"
         autocomplete="off"
-        class="bg-blue-200 input input-bordered w-full max-w-xs"
+        class="input input-bordered input-secondary w-full max-w-xs"
         type="textarea"
         {{#if workout}}
         value="{{workout.note}}"
@@ -144,7 +144,7 @@
       name="datetime"
       id="datetime"
       autocomplete="off"
-      class="bg-blue-200 input input-bordered w-full max-w-xs"
+      class="input input-bordered input-secondary w-full max-w-xs"
       type="text"
       value="{{workout.datetime}}"
     />
@@ -165,7 +165,7 @@
 {{#if edit}}
 <div>
   <button
-    class="btn"
+    class="btn btn-primary" 
     hx-get="/refresh-table?machine_id={{workout.machine_id}}"
     hx-swap="none"
   >
