@@ -11,6 +11,6 @@ export default {
   ],
   daisyui: {
     logs: false,
-    themes: ["dracula"],
+    themes: ["autumn"],
   },
 };

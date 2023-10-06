@@ -4,7 +4,7 @@
 
 @layer base {
   a {
-    @apply text-primary;
+    @apply text-primary-focus font-bold;
   }
 }
 
