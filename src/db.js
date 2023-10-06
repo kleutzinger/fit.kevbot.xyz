@@ -49,6 +49,7 @@ const userSchema = z.object({
   email: z.string().email(),
   note: z.string().optional(),
   datetime: z.coerce.string().datetime(),
+  theme: z.coerce.string().default("autumn"),
 });
 // get zod object keys recursively
 const zodKeys = (schema) => {
@@ -313,9 +314,25 @@ function updateDBItem(tableName, allFields) {
   return `updated ${tableName}: ${JSON.stringify(fields)}`;
 }
 
+function getUserTheme(user_email) {
+  const theme = db
+    .prepare("SELECT theme FROM users WHERE email = ?")
+    .get(user_email);
+  return theme.theme;
+}
+
+function updateUserTheme(user_email, new_theme) {
+  const out = db
+    .prepare("UPDATE users SET theme = ? WHERE email = ?")
+    .run(new_theme, user_email);
+  return `updated user theme to ${new_theme}`;
+}
+
 export {
   initUser,
   getCSV,
+  getUserTheme,
+  updateUserTheme,
   getJSON,
   zodKeys,
   db,

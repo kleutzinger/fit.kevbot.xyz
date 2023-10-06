@@ -15,7 +15,7 @@
   <input name="duration_active" type="checkbox" autocomplete="off" />
   <label for="duration_active">duration_active</label>
   <br />
-  <button class="btn btn-blue">Submit new machine</button>
+  <button class="btn btn-primary">Submit new machine</button>
 </form>
 <h1>EDIT {{endpoint}}s</h1>
 {{#each columns}} {{this.key}} {{/each}}
@@ -39,12 +39,12 @@
     <label for="{{column.key}}">{{column.key}}</label>
     <br />
     {{/each}}
-    <button class="btn btn-blue">
+    <button class="btn btn-accent">
       submit update {{item.id}} {{item.name}}
     </button>
   </form>
   <button
-    class="btn btn-red"
+    class="btn btn-accent"
     hx-post="/delete-{{../endpoint}}?id={{item.id}}"
     hx-swap="outerHTML"
     hx-confirm="Are you sure you want to delete {{item.id}} {{item.name}}?"

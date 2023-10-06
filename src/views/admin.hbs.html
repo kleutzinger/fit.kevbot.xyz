@@ -1,7 +1,9 @@
 <div class="container mx-auto p-5">
-  <a class="btn btn-red" href="/logout">log out</a>
-  <a class="btn btn-blue" href="/download-csv">download-csv</a>
-  <a class="btn btn-blue" href="/download-json">download-json</a>
-  <div hx-get="/user-info" hx-replace="this" hx-trigger="load"></div>
+  <a class="btn btn-primary" href="/logout">log out</a>
+  <a class="btn btn-primary" href="/download-csv">download-csv</a>
+  <a class="btn btn-primary" href="/download-json">download-json</a>
+  <h1>Update theme:</h1>
+  <div hx-get="/theme-update-links" hx-replace="this" hx-trigger="load"></div>
   <p id="output"></p>
+  <div hx-get="/user-info" hx-replace="this" hx-trigger="load"></div>
 </div>

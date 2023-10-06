@@ -8,6 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import express from "express";
 import tracer from "tracer";
 const logger = tracer.colorConsole();
+import { themes } from "./utils/daisyui-themes.js";
+
 const log = logger.log;
 import { d, isElement } from "./hyperscript-helper.js";
 
@@ -49,6 +51,8 @@ import {
   workoutSchema,
   deleteWorkout,
   getCSV,
+  getUserTheme,
+  updateUserTheme,
   updateDBItem,
   getMachine,
   machineSchema,
@@ -89,7 +93,7 @@ app.use(htmlElementMiddleware);
 
 // redirect here if not authenticated
 app.get("/signup", (_, res) => {
-  res.render("signup", { layout: "page", nonavbar: true });
+  res.render("signup", { layout: "page", nonavbar: true, theme: "light" });
 });
 
 // Middleware to check if user is authenticated
@@ -384,6 +388,7 @@ app.get("/edit-machines", (req, res) => {
   const columns = zodSchemaToEditColumns(machineSchema);
   res.render("edit-page", {
     layout: "page",
+    theme: getUserTheme(user_email),
     user: req.oidc.user,
     items: getMachines(user_email),
     endpoint: "machine",
@@ -391,13 +396,12 @@ app.get("/edit-machines", (req, res) => {
   });
 });
 
-app.get("/admin", (_, res) => {
-  res.render("admin", { layout: "page" });
+app.get("/admin", (req, res) => {
+  res.render("admin", { layout: "page", theme: getUserTheme(req2email(req)) });
 });
 
 app.get("/graph", (req, res) => {
-  initUser(req2email(req));
-  res.render("graph", { layout: "page" });
+  res.render("graph", { layout: "page", theme: getUserTheme(req2email(req)) });
 });
 
 app.get("/machine-links", (req, res) => {
@@ -411,11 +415,32 @@ app.get("/machine-links", (req, res) => {
       machines.map((m) =>
         d.a(
           { href: `/?machine_ids=${m.id}` },
-          d.button({ class: "btn btn-primary" }, m.name),
+          d.button({ class: "btn btn-accent" }, m.name),
         ),
       ),
     ),
   );
+});
+
+app.get("/theme-update-links", (req, res) => {
+  // machines.map((m) => d.option({ value: m.id }, m.name).outerHTML).join(""),
+  const themeLinks = themes
+    .map(
+      (i) =>
+        `<a href="/update-theme?theme=${i}"><button class="btn btn-primary">${i}</button></a>`,
+    )
+    .join("");
+  res.send(themeLinks);
+});
+
+app.get("/update-theme", (req, res) => {
+  const user_email = req2email(req);
+  const theme = req.query?.theme;
+  if (!themes.includes(theme)) {
+    return res.send(`Invalid theme "${theme}"`);
+  }
+  updateUserTheme(user_email, theme);
+  res.redirect(req.get("referer"));
 });
 
 app.get("/", (req, res) => {
@@ -428,7 +453,12 @@ app.get("/", (req, res) => {
       .join(",");
     res.redirect("/?machine_ids=" + machine_ids);
   }
-  res.render("index", { layout: "page", user: req.oidc.user, machine_ids });
+  res.render("index", {
+    layout: "page",
+    user: req.oidc.user,
+    theme: getUserTheme(user_email),
+    machine_ids,
+  });
 });
 
 app.listen(port, () => {
