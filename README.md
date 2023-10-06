@@ -6,10 +6,20 @@ https://fit.kevbot.xyz
 
 ## How to run this project
 
+Dev mode:
+
 - `cp .env-example .env`
 - `npm install`
 - `npm run init-db`
 - `npm run dev`
+
+Production
+
+- set up env vars...
+- `npm install`
+- `npm run init-db`
+- `npm run build`
+- `npm run start`
 
 To run in production remove the `NO_AUTH` env var and set up your own `auth0Config` in `src/index.js`
 

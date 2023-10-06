@@ -9,9 +9,10 @@ import express from "express";
 import tracer from "tracer";
 const logger = tracer.colorConsole();
 import { themes } from "./utils/daisyui-themes.js";
+import { a, p, br, div, option, select, button } from "@kleutzinger/html-builder";
+// wrap button into custom tag
 
 const log = logger.log;
-import { d, isElement } from "./hyperscript-helper.js";
 
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
@@ -77,23 +78,9 @@ const auth0Config = {
   issuerBaseURL: "https://dev-4gfidufu1t4at7rq.us.auth0.com",
 };
 
-const htmlElementMiddleware = (req, res, next) => {
-  const originalSend = res.send;
-
-  res.send = function (body) {
-    if (isElement(body)) {
-      body = body.outerHTML;
-    }
-    originalSend.call(this, body);
-  };
-  next();
-};
-
-app.use(htmlElementMiddleware);
-
 // redirect here if not authenticated
 app.get("/signup", (_, res) => {
-  res.render("signup", { layout: "page", nonavbar: true, theme: "light" });
+  res.render("signup", { layout: "page", nonavbar: true, theme: "retro" });
 });
 
 // Middleware to check if user is authenticated
@@ -121,9 +108,7 @@ function req2email(req) {
 app.get("/machine-name-options", (req, res) => {
   const user_email = req2email(req);
   const machines = getMachines(user_email);
-  res.send(
-    machines.map((m) => d.option({ value: m.id }, m.name).outerHTML).join(""),
-  );
+  res.send(machines.map((m) => option({ value: m.id }, m.name)).join(""));
 });
 
 app.get("/machine-column-options", (req, res) => {
@@ -411,19 +396,18 @@ app.get("/machine-links", (req, res) => {
     ...getMachines(user_email),
   ];
   res.send(
-    d.html(
-      machines.map((m) =>
-        d.a(
+    machines
+      .map((m) =>
+        a(
           { href: `/?machine_ids=${m.id}` },
-          d.button({ class: "btn btn-accent" }, m.name),
+          button({ class: "btn btn-accent" }, m.name),
         ),
-      ),
-    ),
+      )
+      .join(""),
   );
 });
 
 app.get("/theme-update-links", (req, res) => {
-  // machines.map((m) => d.option({ value: m.id }, m.name).outerHTML).join(""),
   const themeLinks = themes
     .map(
       (i) =>
