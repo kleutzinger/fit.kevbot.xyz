@@ -14,12 +14,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="/style.css" rel="stylesheet" />
     {{> htmx}} {{> matomo}}
+    <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
   </head>
   <body>
     {{#if nonavbar}} <span></span> {{else}} {{> navbar}} {{/if}}
     <!-- startbody -->
     {{{body}}}
     <!-- endbody -->
+    <div id="toast-container" class="toast-container"></div>
     {{> kevbadge}}
   </body>
 </html>

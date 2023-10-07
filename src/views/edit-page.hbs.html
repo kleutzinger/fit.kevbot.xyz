@@ -1,56 +1,60 @@
 <div hx-trigger="load" hx-get="/user-info" hx-swap="innerHTML"></div>
-<h2>warning: you are modifying the database!</h2>
-<p id="output">output goes here</p>
-<h1>ADD NEW {{endpoint}}</h1>
-<form hx-post="/new-machine" hx-target="#output" hx-swap="innerHTML">
-  <input name="name" class="machine-input" type="text" autocomplete="off" />
-  <input name="weight_active" type="checkbox" autocomplete="off" />
-  <label for="weight_active">weight_active</label>
-  <input name="energy_active" type="checkbox" autocomplete="off" />
-  <label for="energy_active">energy_active</label>
-  <input name="reps_active" type="checkbox" autocomplete="off" />
-  <label for="reps_active">reps_active</label>
-  <input name="distance_active" type="checkbox" autocomplete="off" />
-  <label for="distance_active">distance_active</label>
-  <input name="duration_active" type="checkbox" autocomplete="off" />
-  <label for="duration_active">duration_active</label>
-  <br />
-  <button class="btn btn-primary">Submit new machine</button>
-</form>
-<h1>EDIT {{endpoint}}s</h1>
-{{#each columns}} {{this.key}} {{/each}}
-<div>
-  {{#each items as |item|}}
-  <form
-    id="form-{{item.id}}"
-    hx-post="/update-{{../endpoint}}"
-    hx-target="#output"
-    hx-swap="innerHTML"
-  >
-    {{#each ../columns as |column|}}
-    <input
-      type="{{column.input_type}}"
-      {{column.readonly}}
-      id="{{column.key}}"
-      name="{{column.key}}"
-      autocomplete="off"
-      value="{{lookup item column.key}}"
-    />
-    <label for="{{column.key}}">{{column.key}}</label>
+<div class="grid grid-cols-1 justify-items-center p-8">
+  <h2>warning: you are modifying the database!</h2>
+  <h1>ADD NEW {{endpoint}}</h1>
+  <p class="output break-words"></p>
+  <form hx-post="/new-machine" hx-target="previous .output" hx-swap="innerHTML">
+    <input name="name" class="machine-input" type="text" autocomplete="off" />
+    <input name="weight_active" type="checkbox" autocomplete="off" />
+    <label for="weight_active">weight_active</label>
+    <input name="energy_active" type="checkbox" autocomplete="off" />
+    <label for="energy_active">energy_active</label>
+    <input name="reps_active" type="checkbox" autocomplete="off" />
+    <label for="reps_active">reps_active</label>
+    <input name="distance_active" type="checkbox" autocomplete="off" />
+    <label for="distance_active">distance_active</label>
+    <input name="duration_active" type="checkbox" autocomplete="off" />
+    <label for="duration_active">duration_active</label>
     <br />
-    {{/each}}
-    <button class="btn btn-accent">
-      submit update {{item.id}} {{item.name}}
-    </button>
+    <button class="btn btn-primary">Submit new machine</button>
   </form>
-  <button
-    class="btn btn-accent"
-    hx-post="/delete-{{../endpoint}}?id={{item.id}}"
-    hx-swap="outerHTML"
-    hx-confirm="Are you sure you want to delete {{item.id}} {{item.name}}?"
-    hx-target="#form-{{item.id}}"
-  >
-    delete {{item.id}} {{item.name}}
-  </button>
+</div>
+<div class="grid grid-cols-1 justify-items-center p-8">
+  <h1>EDIT {{endpoint}}s</h1>
+  {{#each items as |item|}}
+  <div class="mx-auto text-sm max-w-prose">
+    <p class="output break-all"></p>
+    <form
+      id="form-{{item.id}}"
+      hx-post="/update-{{../endpoint}}"
+      hx-target="previous .output"
+      hx-swap="innerHTML"
+    >
+      {{#each ../columns as |column|}}
+      <input
+        type="{{column.input_type}}"
+        {{column.readonly}}
+        id="{{column.key}}"
+        name="{{column.key}}"
+        autocomplete="off"
+        value="{{lookup item column.key}}"
+      />
+      <label for="{{column.key}}">{{column.key}}</label>
+      <br />
+      {{/each}}
+      <button class="btn btn-accent">
+        submit update {{item.id}} {{item.name}}
+      </button>
+    </form>
+    <button
+      class="btn btn-accent"
+      hx-post="/delete-{{../endpoint}}?id={{item.id}}"
+      hx-swap="outerHTML"
+      hx-confirm="Are you sure you want to delete {{item.id}} {{item.name}}?"
+      hx-target="#form-{{item.id}}"
+    >
+      delete {{item.id}} {{item.name}}
+    </button>
+  </div>
   {{/each}}
 </div>

@@ -104,6 +104,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] fix auth0 using dev keys
 - [ ] make homepage 1 (or 2) db / network queries
 - [x] fix /signup page!
+- [x] toast messages (error handling)
 
 ## Graphs
 

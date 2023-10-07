@@ -1,0 +1,16 @@
+<!-- handle message -->
+{{#if msg}}
+<div _="on click remove me" class="toast toast-bottom toast-start">
+  <div class="alert alert-success bg-primary">
+    <span>{{msg}}</span>
+  </div>
+</div>
+{{/if}}
+<!-- handle error -->
+{{#if err}}
+<div _="on click remove me" class="toast toast-bottom toast-start">
+  <div class="alert alert-info">
+    <span>{{err}}</span>
+  </div>
+</div>
+{{/if}}

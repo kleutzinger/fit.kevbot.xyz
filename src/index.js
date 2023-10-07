@@ -154,7 +154,7 @@ app.get("/download-json", (req, res) => {
   res.json(jsonText);
 });
 
-app.get("/full-workout-form", (req, res) => {
+app.get("/full-workout-form", (req, res, next) => {
   try {
     const user_email = req2email(req);
     const machine_id = req.query?.machine_id;
@@ -219,12 +219,11 @@ app.get("/full-workout-form", (req, res) => {
       include_table,
     });
   } catch (err) {
-    console.error(err);
-    res.send(err.message);
+    next(err);
   }
 });
 
-app.post("/submit-new-workout", (req, res) => {
+app.post("/submit-new-workout", (req, res, next) => {
   const user_email = req2email(req);
   req.body.datetime = new Date().toISOString();
   req.body.user_email = user_email;
@@ -246,42 +245,42 @@ app.post("/submit-new-workout", (req, res) => {
       !submitObj.distance &&
       !submitObj.energy
     ) {
-      return res.send("Please fill out at least one field");
+      throw new Error("No data submitted");
     }
     const serverResp = addWorkout(submitObj);
     const machine_id = submitObj.machine_id;
     res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
-    console.error(err);
-    res.send(err?.issues);
+    next(err);
   }
 });
 
-app.post("/new-machine", (req, res) => {
-  const user_email = req2email(req);
-  req.body.datetime = new Date().toISOString();
-  req.body.user_email = user_email;
-  req.body.weight_active = req.body.weight_active == "on";
-  req.body.reps_active = req.body.reps_active == "on";
-  req.body.duration_active = req.body.duration_active == "on";
-  req.body.distance_active = req.body.distance_active == "on";
-  req.body.energy_active = req.body.energy_active == "on";
-  const machine = machineSchema.parse(req.body);
+function renderSuccess(msg, res) {
+  res.setHeader("HX-Retarget", ".toast-container");
+  res.setHeader("HX-Reswap", "innerHTML");
+  res.render("toast", { msg });
+}
+
+app.post("/new-machine", (req, res, next) => {
   try {
-    let serverResp = addMachine(user_email, machine);
-    res.send(
-      `I submitted: ${JSON.stringify(machine, null, 2)}  ${JSON.stringify(
-        serverResp,
-      )}`,
-    );
+    const user_email = req2email(req);
+    req.body.datetime = new Date().toISOString();
+    req.body.user_email = user_email;
+    req.body.weight_active = req.body.weight_active == "on";
+    req.body.reps_active = req.body.reps_active == "on";
+    req.body.duration_active = req.body.duration_active == "on";
+    req.body.distance_active = req.body.distance_active == "on";
+    req.body.energy_active = req.body.energy_active == "on";
+    const machine = machineSchema.parse(req.body);
+    const serverResp = addMachine(user_email, machine);
+    return renderSuccess(`Added machine "${machine.name}"`, res);
   } catch (err) {
-    console.log(err);
-    return res.send("Invalid machine");
+    next(err);
   }
 });
 
-app.post("/update-workout/:id", (req, res) => {
+app.post("/update-workout/:id", (req, res, next) => {
   try {
     const user_email = req2email(req);
     const workout_id = req.params?.id;
@@ -299,12 +298,11 @@ app.post("/update-workout/:id", (req, res) => {
     res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
-    console.error(err);
-    res.send(err?.issues || err.message);
+    next(err);
   }
 });
 
-app.post("/update-machine", (req, res) => {
+app.post("/update-machine", (req, res, next) => {
   try {
     const user_email = req2email(req);
     const machine_id = req.body.id;
@@ -314,12 +312,11 @@ app.post("/update-machine", (req, res) => {
     const serverResp = updateDBItem("machines", newMachine);
     res.send(serverResp);
   } catch (err) {
-    console.error(err);
-    res.send(err?.issues || err.message);
+    next(err);
   }
 });
 
-app.post("/delete-workout", (req, res) => {
+app.post("/delete-workout", (req, res, next) => {
   try {
     const user_email = req2email(req);
     const workout_id = req?.query?.id;
@@ -328,20 +325,18 @@ app.post("/delete-workout", (req, res) => {
     res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
     res.send(serverResp);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(JSON.stringify(err));
+    next(err);
   }
 });
 
-app.post("/delete-machine", (req, res) => {
+app.post("/delete-machine", (req, res, next) => {
   try {
     const user_email = req2email(req);
     const machine_id = req?.query?.id;
     const serverResp = deleteMachine(machine_id, user_email);
     res.send(serverResp);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(JSON.stringify(err));
+    next(err);
   }
 });
 
@@ -401,13 +396,22 @@ app.get("/machine-links", (req, res) => {
 });
 
 app.get("/theme-update-links", (req, res) => {
+  const user_theme = getUserTheme(req2email(req));
   const themeLinks = themes
-    .map((t) =>
-      a(
+    .map((t) => {
+      return a(
         { href: `/update-theme?theme=${t}` },
-        button({ class: "btn btn-primary" }, t),
-      ),
-    )
+        button(
+          {
+            class:
+              user_theme == t
+                ? "btn btn-accent text-4xl px-2"
+                : "btn btn-primary",
+          },
+          t,
+        ),
+      );
+    })
     .join("");
   res.send(themeLinks);
 });
@@ -420,6 +424,12 @@ app.get("/update-theme", (req, res) => {
   }
   updateUserTheme(user_email, theme);
   res.redirect(req.get("referer"));
+});
+
+app.get("/toast", (req, res) => {
+  const msg = req.query?.msg || req.body?.msg;
+  // res.setHeader("HX-Retarget", ".toast-container");
+  res.render("toast", { msg });
 });
 
 app.get("/", (req, res) => {
@@ -438,6 +448,15 @@ app.get("/", (req, res) => {
     theme: getUserTheme(user_email),
     machine_ids,
   });
+});
+
+app.use((err, req, res, next) => {
+  // error handling middleware
+  const errText = err?.issues || err.message;
+  log("error caught!\n" + errText);
+  res.setHeader("HX-Retarget", ".toast-container");
+  res.setHeader("HX-Reswap", "innerHTML");
+  return res.render("toast", { err: errText });
 });
 
 app.listen(port, () => {

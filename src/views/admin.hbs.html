@@ -1,9 +1,14 @@
 <div class="container mx-auto p-5">
+  <h1 class="text-3xl">Utilities</h1>
   <a class="btn btn-primary" href="/logout">log out</a>
   <a class="btn btn-primary" href="/download-csv">download-csv</a>
   <a class="btn btn-primary" href="/download-json">download-json</a>
-  <h1>Update theme:</h1>
-  <div hx-get="/theme-update-links" hx-replace="this" hx-trigger="load"></div>
-  <p id="output"></p>
-  <div hx-get="/user-info" hx-replace="this" hx-trigger="load"></div>
+  <h1 class="text-3xl">Update theme:</h1>
+  <div hx-get="/theme-update-links" hx-swap="innerHTML" hx-trigger="load"></div>
+  <input
+    readonly
+    class="input input-bordered input-primary w-full max-w-xs p-4"
+    type="text"
+    value="example input"
+  />
 </div>
