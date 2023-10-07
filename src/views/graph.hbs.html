@@ -3,20 +3,22 @@
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-<select
-  id="machine_id"
-  hx-get="/machine-name-options"
-  hx-trigger="load"
-  hx-swap="innerHTML"
-  hx-target="this"
-></select>
-<select
-  id="column"
-  hx-get="/machine-column-options"
-  hx-trigger="load"
-  hx-swap="innerHTML"
-  hx-target="this"
-></select>
+<div id="input-section">
+  <select
+    id="machine_id"
+    hx-get="/machine-name-options"
+    hx-trigger="load"
+    hx-swap="innerHTML"
+    hx-target="this"
+  ></select>
+  <select
+    id="column"
+    hx-get="/machine-column-options"
+    hx-trigger="load"
+    hx-swap="innerHTML"
+    hx-target="this"
+  ></select>
+</div>
 
 <script>
   // set select values if query params provided
@@ -42,11 +44,15 @@
     var resp = await fetch("/download-json");
     var json = await resp.json();
     const all_workouts = json.workouts;
+    const all_machines = json.machines;
     all_workouts.sort(function (a, b) {
       return new Date(a.datetime) - new Date(b.datetime);
     });
     function workoutsToChart() {
       const machine_id = document.getElementById("machine_id").value;
+      const machine_name = all_machines?.find(function (e) {
+        return e.id == machine_id;
+      }).name;
       const column = document.getElementById("column").value;
       var workouts = all_workouts.filter(function (e) {
         return e.machine_id == machine_id;
@@ -60,12 +66,12 @@
 
       Highcharts.chart("container", {
         title: {
-          text: `${workouts[0]?.machine_name} ${column} history`,
+          text: `${machine_name} ${column} history`,
           align: "left",
         },
 
         subtitle: {
-          text: 'Subtitle',
+          text: "Subtitle",
           align: "left",
         },
 
@@ -126,7 +132,7 @@
     var button = document.createElement("button");
     button.innerHTML = "Update Chart";
     button.onclick = workoutsToChart;
-    document.getElementById("butt").appendChild(button);
+    document.getElementById("input-section").appendChild(button);
     // add onchange to both selects also
     document.getElementById("machine_id").onchange = workoutsToChart;
     document.getElementById("column").onchange = workoutsToChart;

@@ -402,9 +402,11 @@ app.get("/machine-links", (req, res) => {
 
 app.get("/theme-update-links", (req, res) => {
   const themeLinks = themes
-    .map(
-      (i) =>
-        `<a href="/update-theme?theme=${i}"><button class="btn btn-primary">${i}</button></a>`,
+    .map((t) =>
+      a(
+        { href: `/update-theme?theme=${t}` },
+        button({ class: "btn btn-primary" }, t),
+      ),
     )
     .join("");
   res.send(themeLinks);
