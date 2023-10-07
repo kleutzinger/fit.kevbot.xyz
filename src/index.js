@@ -9,8 +9,7 @@ import express from "express";
 import tracer from "tracer";
 const logger = tracer.colorConsole();
 import { themes } from "./utils/daisyui-themes.js";
-import { a, p, br, div, option, select, button } from "@kleutzinger/html-builder";
-// wrap button into custom tag
+import { a, option, button } from "@kleutzinger/html-builder";
 
 const log = logger.log;
 
@@ -23,7 +22,7 @@ const timeAgo = new TimeAgo("en-US");
 const app = express();
 const port = process.env.PORT || 5000;
 const base_url = process.env.BASE_URL || `http://localhost:${port}`;
-const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
+// const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
 import { create } from "express-handlebars";
 const hbs = create({
   defaultLayout: "bare",
@@ -121,7 +120,7 @@ app.get("/machine-column-options", (req, res) => {
     "distance",
     "energy",
   ];
-  res.send(cols.map((i) => `<option value="${i}">${i}</option>`).join(""));
+  res.send(cols.map((i) => option({ value: i }, i)).join(""));
 });
 
 app.get("/user-info", (req, res) => {
@@ -257,12 +256,6 @@ app.post("/submit-new-workout", (req, res) => {
     console.error(err);
     res.send(err?.issues);
   }
-});
-
-app.get("/refresh-table", (req, res) => {
-  const machine_id = req.query?.machine_id;
-  res.setHeader("HX-Trigger", "workout-modified-machine-id-" + machine_id);
-  res.send("ok");
 });
 
 app.post("/new-machine", (req, res) => {

@@ -140,6 +140,9 @@
     </div>
     {{#if workout}}
     <div>
+    <label class="label" for="datetime">
+      <span class="label-text">Datetime</span>
+    </label>
     <input
       name="datetime"
       id="datetime"
@@ -148,7 +151,6 @@
       type="text"
       value="{{workout.datetime}}"
     />
-    <label for="datetime">Date</label>
     </div>
     {{/if}}
     <div>
@@ -166,8 +168,9 @@
 <div>
   <button
     class="btn btn-primary" 
-    hx-get="/refresh-table?machine_id={{workout.machine_id}}"
-    hx-swap="none"
+    hx-get="/full-workout-form?machine_id={{workout.machine_id}}"
+    hx-swap="innerHTML"
+    hx-target="closest .full-workout-form-container"
   >
     Cancel Editing
   </button>

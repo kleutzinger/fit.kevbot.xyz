@@ -11,11 +11,10 @@
   </div>
   {{#each machine_ids as |machine_id|}}
   <div
-    class="full-workout-form grid grid-cols-1 justify-items-center"
+    class="full-workout-form-container"
     hx-get="/full-workout-form?machine_id={{machine_id}}"
     hx-trigger="load"
-    hx-replace="innerHTML"
-    hx-target="this"
+    hx-swap="innerHTML"
   ></div>
   {{> line-break text='*' }} {{/each}}
 

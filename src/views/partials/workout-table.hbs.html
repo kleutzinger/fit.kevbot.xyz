@@ -1,5 +1,4 @@
-<div class="overflow-x-auto overflow-visible">
-<table class="table-fixed">
+<table class="table-fixed" hx-get="/full-workout-form?machine_id={{machine.id}}" hx-target="closest .full-workout-form-container" hx-swap="innerHTML" hx-trigger="workout-modified-machine-id-{{machine.id}} from:body">
   <thead>
     <tr>
       {{#each columns}}
@@ -24,7 +23,7 @@
       <td>
         <a
           class="cursor-pointer edit-icon"
-          hx-target="closest .full-workout-form"
+          hx-target="closest .full-workout-form-container"
           hx-swap="innerHTML"
           hx-get="/full-workout-form?machine_id={{workout.machine_id}}&edit=true&edit_workout_id={{workout.id}}&table_limit={{table_limit}}"
           hx-trigger="click"
@@ -38,4 +37,3 @@
     {{/each}}
   </tbody>
 </table>
-</div>

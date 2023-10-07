@@ -207,7 +207,7 @@ const getWorkouts = (user_email, machine_id, limit) => {
 const getMachines = (user_email, limit) => {
   return db
     .prepare(
-      "SELECT * FROM machines WHERE user_email = ? ORDER BY display_order DESC LIMIT ?",
+      "SELECT * FROM machines WHERE user_email = ? ORDER BY name ASC LIMIT ?",
     )
     .all(user_email, limit || 10000);
 };
