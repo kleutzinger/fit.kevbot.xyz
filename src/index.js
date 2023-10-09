@@ -245,7 +245,7 @@ app.post("/submit-new-workout", (req, res, next) => {
       !submitObj.distance &&
       !submitObj.energy
     ) {
-      throw new Error("No data submitted");
+      throw new Error("Error submitting: Please fill out at lest one field");
     }
     const serverResp = addWorkout(submitObj);
     const machine_id = submitObj.machine_id;
@@ -456,7 +456,7 @@ app.use((err, req, res, next) => {
   log("error caught!\n" + errText);
   res.setHeader("HX-Retarget", ".toast-container");
   res.setHeader("HX-Reswap", "innerHTML");
-  return res.render("toast", { err: errText });
+  return res.render("toast", { msg: errText });
 });
 
 app.listen(port, () => {

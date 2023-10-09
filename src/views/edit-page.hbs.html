@@ -4,7 +4,7 @@
   <h1>ADD NEW {{endpoint}}</h1>
   <p class="output break-words"></p>
   <form hx-post="/new-machine" hx-target="previous .output" hx-swap="innerHTML">
-    <input name="name" class="machine-input" type="text" autocomplete="off" />
+    <input name="name" class="input" type="text" autocomplete="off" />
     <input name="weight_active" type="checkbox" autocomplete="off" />
     <label for="weight_active">weight_active</label>
     <input name="energy_active" type="checkbox" autocomplete="off" />

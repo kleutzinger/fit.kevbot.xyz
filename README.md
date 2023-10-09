@@ -4,6 +4,8 @@
 
 https://fit.kevbot.xyz
 
+![example image of ui](./public/ui-example.png)
+
 ## How to run this project
 
 Dev mode:
