@@ -48,6 +48,10 @@ import {
   deleteMachine,
   addMachineName as addMachine,
   addWorkout,
+  insertDBItem,
+  sequenceSchema,
+  getSequences,
+  deleteSequence,
   workoutSchema,
   deleteWorkout,
   getCSV,
@@ -280,6 +284,23 @@ app.post("/new-machine", (req, res, next) => {
   }
 });
 
+app.post("/new-sequence", (req, res, next) => {
+  try {
+    const user_email = req2email(req);
+    req.body.date_created = new Date().toISOString();
+    req.body.date_updated = req.body.date_created;
+    req.body.user_email = user_email;
+    // remove trailing comma from req.body.machine_ids if present
+    req.body.machine_ids = req.body.machine_ids.replace(/(,)*$/, "");
+
+    const sequence = sequenceSchema.parse(req.body);
+    const serverResp = insertDBItem("sequences", sequence);
+    return renderSuccess(`Added sequence "${sequence.name}"`, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post("/update-workout/:id", (req, res, next) => {
   try {
     const user_email = req2email(req);
@@ -377,18 +398,56 @@ app.get("/graph", (req, res) => {
   res.render("graph", { layout: "page", theme: getUserTheme(req2email(req)) });
 });
 
+app.get("/sequence-delete-buttons", (req, res) => {
+  const user_email = req2email(req);
+  const sequences = getSequences(user_email);
+  if (sequences.length === 0) {
+    return res.send("no sequences added yet");
+  }
+  const buttons = sequences.map((s) => {
+    return a(
+      {
+        class: "btn btn-primary",
+        "hx-delete": `/delete-sequence?id=${s.id}`,
+        "hx-confirm": `Are you sure you want to delete sequence ${s.name} with ids ${s.machine_ids}?`,
+      },
+      s.name + " delete!",
+    );
+  });
+  res.send(buttons.join(""));
+});
+
+app.delete("/delete-sequence", (req, res, next) => {
+  try {
+    const user_email = req2email(req);
+    const sequence_id = req?.query?.id;
+    const serverResp = deleteSequence(sequence_id, user_email);
+    return renderSuccess(serverResp, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get("/machine-links", (req, res) => {
   const user_email = req2email(req);
-  const machines = [
-    { id: "all", name: "All Machines" },
-    ...getMachines(user_email),
-  ];
+  const sequences = getSequences(user_email);
+  let nameHrefs = [];
+  nameHrefs.push({ href: "/?machine_ids=all", name: "All Machines" });
+  for (const s of sequences) {
+    const href = `/?machine_ids=${s.machine_ids}`;
+    nameHrefs.push({ href, name: s.name, class: "btn btn-accent" });
+  }
+  const machines = getMachines(user_email);
+  for (const m of machines) {
+    const href = `/?machine_ids=${m.id}`;
+    nameHrefs.push({ href, name: m.name });
+  }
   res.send(
-    machines
+    nameHrefs
       .map((m) =>
         a(
-          { href: `/?machine_ids=${m.id}` },
-          button({ class: "btn btn-accent" }, m.name),
+          { href: m.href },
+          button({ class: m.class || "btn btn-primary" }, m.name),
         ),
       )
       .join(""),
@@ -453,7 +512,8 @@ app.get("/", (req, res) => {
 app.use((err, req, res, next) => {
   // error handling middleware
   const errText = err?.issues || err.message;
-  log("error caught!\n" + errText);
+  console.error(err);
+  log("error caught!\n" + JSON.stringify(errText));
   res.setHeader("HX-Retarget", ".toast-container");
   res.setHeader("HX-Reswap", "innerHTML");
   return res.render("toast", { msg: errText });

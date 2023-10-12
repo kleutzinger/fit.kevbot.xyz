@@ -1,16 +1,71 @@
 <div hx-trigger="load" hx-get="/user-info" hx-swap="innerHTML"></div>
 <div class="grid grid-cols-1 justify-items-center p-8">
   <h2>warning: you are modifying the database!</h2>
-  <h1>ADD NEW {{endpoint}}</h1>
   <p class="output break-words"></p>
+  <p class="text-4xl">ADD NEW WORKOUT SEQUENCE</p>
+  <p>
+    say you want to group together cardio, which could be: biking, rowing,
+    running
+  </p>
+  <form hx-post="/new-sequence">
+    <label for="name">name</label>
+    <input
+      name="name"
+      type="text"
+      autocomplete="off"
+      required
+      placeholder="name of workout sequence"
+    />
+    <label for="machine_ids">machine_ids</label>
+    <input
+      name="machine_ids"
+      id="machine_ids"
+      placeholder="list of workout ids to include"
+      type="text"
+      autocomplete="off"
+      required
+    />
+    <label for="note">notes</label>
+    <input name="note" type="text" autocomplete="off" />
+    <br />
+    {{#each items as |item|}}
+    <button
+      _="on click
+                 get the (value of #machine_ids)
+                 append '{{item.id}},'
+                 put it into the (value of #machine_ids)"
+      class="btn btn-accent"
+      type="button"
+    >
+      add {{item.name}}
+    </button>
+    {{/each}}
+    <button class="btn btn-primary">Submit new sequence</button>
+  </form>
+  <br />
+  <div class="py-4">
+    <a
+      class="btn btn-warning text-2xl"
+      hx-get="/sequence-delete-buttons"
+      hx-trigger="click"
+      hx-swap="OuterHTML"
+      hx-target="this"
+    >
+      delete a sequence?
+    </a>
+  </div>
+  <br />
+  <br />
+  <p class="text-4xl">ADD NEW WORKOUT TYPE</p>
   <form hx-post="/new-machine" hx-target="previous .output" hx-swap="innerHTML">
-    <input name="name" class="input" type="text" autocomplete="off" />
+    <label for="name">workout name</label>
+    <input name="name" type="text" autocomplete="off" required />
     <input name="weight_active" type="checkbox" autocomplete="off" />
     <label for="weight_active">weight_active</label>
-    <input name="energy_active" type="checkbox" autocomplete="off" />
-    <label for="energy_active">energy_active</label>
     <input name="reps_active" type="checkbox" autocomplete="off" />
     <label for="reps_active">reps_active</label>
+    <input name="energy_active" type="checkbox" autocomplete="off" />
+    <label for="energy_active">energy_active</label>
     <input name="distance_active" type="checkbox" autocomplete="off" />
     <label for="distance_active">distance_active</label>
     <input name="duration_active" type="checkbox" autocomplete="off" />
@@ -20,7 +75,7 @@
   </form>
 </div>
 <div class="grid grid-cols-1 justify-items-center p-8">
-  <h1>EDIT {{endpoint}}s</h1>
+  <p class="text-3xl">EDIT WORKOUT TYPES</p>
   {{#each items as |item|}}
   <div class="mx-auto text-sm max-w-prose">
     <p class="output break-all"></p>

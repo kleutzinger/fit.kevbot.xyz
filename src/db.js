@@ -13,7 +13,7 @@ const DB_DIR = process.env.DB_DIR || "./db";
 const DB_NAME = process.env.DB_NAME || "db.sqlite";
 const DB_PATH = join(DB_DIR, DB_NAME);
 // const verbose = process.env.NODE_ENV === "development" ? console.log : null;
-const verbose = console.log // process.env.NODE_ENV === "development" ? console.log : null;
+const verbose = console.log; // process.env.NODE_ENV === "development" ? console.log : null;
 const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 
@@ -51,6 +51,18 @@ const userSchema = z.object({
   datetime: z.coerce.string().datetime(),
   theme: z.coerce.string().default("autumn"),
 });
+
+const sequenceSchema = z.object({
+  id: z.coerce.number().int().optional(),
+  user_email: z.string().email(),
+  note: z.string().optional(),
+  name: z.string(),
+  // machine_ids must be of the form "1,2,3,4"
+  machine_ids: z.string().regex(/^\d+(,\d+)*$/),
+  date_created: z.coerce.string().datetime(),
+  date_updated: z.coerce.string().datetime(),
+});
+
 // get zod object keys recursively
 const zodKeys = (schema) => {
   // make sure schema is not null or undefined
@@ -212,6 +224,14 @@ const getMachines = (user_email, limit) => {
     .all(user_email, limit || 10000);
 };
 
+const getSequences = (user_email, limit) => {
+  return db
+    .prepare(
+      "SELECT * FROM sequences WHERE user_email = ? ORDER BY name ASC LIMIT ?",
+    )
+    .all(user_email, limit || 10000);
+};
+
 const getMachine = (user_email, machine_id) => {
   return db
     .prepare("SELECT * FROM machines WHERE user_email = ? AND id = ?")
@@ -297,6 +317,32 @@ function deleteMachine(id, user_email) {
   return "success";
 }
 
+function deleteSequence(id, user_email) {
+  const out = db
+    .prepare("DELETE FROM sequences WHERE id = ? AND user_email = ?")
+    .run(id, user_email);
+  if (out.changes === 0) {
+    throw new Error("No sequence found with that id and email");
+  }
+  return `succesfully deleted sequence: ${id}`;
+}
+
+function insertDBItem(tableName, fields) {
+  const sql = `INSERT INTO ${tableName} (${Object.keys(fields).join(
+    ", ",
+  )}) VALUES (${Object.keys(fields)
+    .map((key) => `@${key}`)
+    .join(", ")})`;
+
+  const out = db.prepare(sql).run(fields);
+  if (out.changes === 0) {
+    throw new Error(
+      `Error inserting ${tableName} with ${JSON.stringify(fields)}`,
+    );
+  }
+  return `inserted ${tableName}: ${JSON.stringify(fields)}`;
+}
+
 function updateDBItem(tableName, allFields) {
   const { id, user_email, ...fields } = allFields;
   const out = db
@@ -328,6 +374,8 @@ function updateUserTheme(user_email, new_theme) {
   return `updated user theme to ${new_theme}`;
 }
 
+function addSequence(user_email, sequence) {}
+
 export {
   initUser,
   getCSV,
@@ -345,6 +393,10 @@ export {
   deleteMachine,
   updateDBItem,
   addMachine as addMachineName,
+  sequenceSchema,
+  getSequences,
+  insertDBItem,
+  deleteSequence,
   getWorkouts,
   workoutSchema,
   machineSchema,

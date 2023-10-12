@@ -86,8 +86,9 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [x] filter to relevant columns in history table
 - [x] navbar
 - [x] make it more single-pagey
-- [ ] alphabetical sort on machine selection
-- [ ] https://htmx.org/extensions/response-targets/
+- [x] alphabetical sort on machine selection
+  - [ ] non-alphabetical sort on machines
+- [x] https://htmx.org/extensions/response-targets/
 - refactor workout template
   - [x] make a single full-workout-form endpoint
   - [x] table and table.limit as params
@@ -95,14 +96,8 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
   - [x] highlight the entry in the table that we are editing
   - [x] maybe I also want a way to get just the talbe?
   - [x] re-work the workout-submit-and-table partial?. basically, instead of a partial, just make an endpoint?
-- [ ] save machine groups to the db (TEXT machine_id_list "12,34,53")
-- [ ] new table machine_groups
-  - id int
-  - notes text
-  - user_email text
-  - machine_ids? TEXT "1,2,3,4"
-  - date_created
-  - date_updated
+- [x] save workout sequences to the db (TEXT machine_id_list "12,34,53")
+- [x] new table sequences (workout sequences)
 - [ ] fix auth0 using dev keys
 - [ ] make homepage 1 (or 2) db / network queries
 - [x] fix /signup page!
