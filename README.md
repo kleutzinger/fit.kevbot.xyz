@@ -102,6 +102,7 @@ To run in production remove the `NO_AUTH` env var and set up your own `auth0Conf
 - [ ] make homepage 1 (or 2) db / network queries
 - [x] fix /signup page!
 - [x] toast messages (error handling)
+- [ ] after submitting, it's hard to tell what machine you just submitted. think about making either it snap to last submitted or lock to one machine at a time and press left/right arrows to go next
 
 ## Graphs
 
