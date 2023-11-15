@@ -439,7 +439,7 @@ app.get("/machine-links", (req, res) => {
     class: "btn btn-accent",
   });
   for (const s of sequences) {
-    const href = `/?machine_ids=${s.machine_ids}`;
+    const href = `/?sequence_name=${s.name}`;
     nameHrefs.push({ href, name: s.name, class: "btn btn-accent" });
   }
   const machines = getMachines(user_email);
@@ -500,11 +500,17 @@ app.get("/", (req, res) => {
   const user_email = req2email(req);
   initUser(user_email);
   let machine_ids = req.query?.machine_ids?.split(",") || [];
+  let sequence_name = req.query?.sequence_name;
   if (machine_ids.length === 0 || machine_ids.includes("all")) {
-    machine_ids = getMachines(user_email)
-      .map((i) => i.id)
-      .join(",");
-    res.redirect("/?machine_ids=" + machine_ids);
+    machine_ids = getMachines(user_email).map((i) => i.id);
+  }
+  if (sequence_name) {
+    const sequence = getSequences(user_email).find(
+      (s) => s.name == sequence_name,
+    );
+    if (sequence) {
+      machine_ids = sequence.machine_ids.split(",");
+    }
   }
   res.render("index", {
     layout: "page",
