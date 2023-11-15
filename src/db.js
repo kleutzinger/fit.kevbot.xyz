@@ -374,8 +374,6 @@ function updateUserTheme(user_email, new_theme) {
   return `updated user theme to ${new_theme}`;
 }
 
-function addSequence(user_email, sequence) {}
-
 export {
   initUser,
   getCSV,

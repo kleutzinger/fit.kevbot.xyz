@@ -42,7 +42,6 @@ app.set("view engine", "hbs.html");
 app.set("views", viewsDir);
 import pkg from "body-parser";
 import {
-  getMachineNames,
   getWorkouts,
   getMachines,
   deleteMachine,
@@ -114,7 +113,7 @@ app.get("/machine-name-options", (req, res) => {
   res.send(machines.map((m) => option({ value: m.id }, m.name)).join(""));
 });
 
-app.get("/machine-column-options", (req, res) => {
+app.get("/machine-column-options", (_, res) => {
   const cols = [
     "weight",
     "note",
@@ -278,6 +277,7 @@ app.post("/new-machine", (req, res, next) => {
     req.body.energy_active = req.body.energy_active == "on";
     const machine = machineSchema.parse(req.body);
     const serverResp = addMachine(user_email, machine);
+    console.log(serverResp);
     return renderSuccess(`Added machine "${machine.name}"`, res);
   } catch (err) {
     next(err);
@@ -295,6 +295,7 @@ app.post("/new-sequence", (req, res, next) => {
 
     const sequence = sequenceSchema.parse(req.body);
     const serverResp = insertDBItem("sequences", sequence);
+    console.log(serverResp);
     return renderSuccess(`Added sequence "${sequence.name}"`, res);
   } catch (err) {
     next(err);
@@ -447,7 +448,7 @@ app.get("/machine-links", (req, res) => {
       .map((m) =>
         a(
           { href: m.href },
-          button({ class: m.class || "btn btn-primary" }, m.name),
+          button({ class: m.class || "btn btn-primary m-1" }, m.name),
         ),
       )
       .join(""),
@@ -509,7 +510,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _, res, __) => {
   // error handling middleware
   const errText = err?.issues || err.message;
   console.error(err);
