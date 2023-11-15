@@ -1,19 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { z } from "zod";
-import path from "path";
-import { fileURLToPath } from "url";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { join } from "path";
-import { existsSync } from "fs";
 import Database from "better-sqlite3";
 import { Parser } from "@json2csv/plainjs";
 
 const DB_DIR = process.env.DB_DIR || "./db";
 const DB_NAME = process.env.DB_NAME || "db.sqlite";
 const DB_PATH = join(DB_DIR, DB_NAME);
-// const verbose = process.env.NODE_ENV === "development" ? console.log : null;
-const verbose = console.log; // process.env.NODE_ENV === "development" ? console.log : null;
+const verbose = process.env.NODE_ENV === "development" ? console.log : null;
 const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 
