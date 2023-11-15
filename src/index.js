@@ -433,7 +433,11 @@ app.get("/machine-links", (req, res) => {
   const user_email = req2email(req);
   const sequences = getSequences(user_email);
   let nameHrefs = [];
-  nameHrefs.push({ href: "/?machine_ids=all", name: "All Machines" });
+  nameHrefs.push({
+    href: "/?machine_ids=all",
+    name: "All Machines",
+    class: "btn btn-accent",
+  });
   for (const s of sequences) {
     const href = `/?machine_ids=${s.machine_ids}`;
     nameHrefs.push({ href, name: s.name, class: "btn btn-accent" });
@@ -448,7 +452,7 @@ app.get("/machine-links", (req, res) => {
       .map((m) =>
         a(
           { href: m.href },
-          button({ class: m.class || "btn btn-primary m-1" }, m.name),
+          button({ class: (m.class || "btn btn-primary") + " m-1" }, m.name),
         ),
       )
       .join(""),
