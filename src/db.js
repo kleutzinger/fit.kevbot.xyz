@@ -249,7 +249,7 @@ const addMachine = (user_email, machine) => {
 
 function getCSV(user_email) {
   try {
-    const workouts = getWorkouts(user_email);
+    const workouts = getWorkouts(user_email).reverse();
     const fieldsToRemove = ["id", "user_email"];
     for (const workout of workouts) {
       for (const field of fieldsToRemove) {
