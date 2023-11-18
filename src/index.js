@@ -248,7 +248,7 @@ app.post("/submit-new-workout", (req, res, next) => {
       !submitObj.distance &&
       !submitObj.energy
     ) {
-      throw new Error("Error submitting: Please fill out at lest one field");
+      throw new Error("Error submitting: Please fill out at least one field");
     }
     const serverResp = addWorkout(submitObj);
     const machine_id = submitObj.machine_id;
