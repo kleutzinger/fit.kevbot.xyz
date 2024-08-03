@@ -22,6 +22,6 @@
     {{{body}}}
     <!-- endbody -->
     <div id="toast-container" class="toast-container"></div>
-    {{> kevbadge}}
+    {{#if hide_page_info}} {{else}} {{> kevbadge}} {{/if}}
   </body>
 </html>

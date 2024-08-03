@@ -45,6 +45,7 @@ const userSchema = z.object({
   note: z.string().optional(),
   datetime: z.coerce.string().datetime(),
   theme: z.coerce.string().default("autumn"),
+  hide_page_info: z.coerce.boolean().default(false),
 });
 
 const sequenceSchema = z.object({
@@ -189,7 +190,7 @@ const getMachineNames = (user_email) => {
 const getWorkouts = (user_email, machine_id, limit) => {
   if (machine_id !== undefined) machine_id = parseInt(machine_id).toString();
   const sql = `
-    SELECT 
+    SELECT
       workouts.*,
       machines.name AS machine_name,
       machines.id AS machine_id,
@@ -369,6 +370,22 @@ function updateUserTheme(user_email, new_theme) {
   return `updated user theme to ${new_theme}`;
 }
 
+function getUserHidePageInfo(user_email) {
+  const is_hidden = db
+    .prepare("SELECT hide_page_info FROM users WHERE email = ?")
+    .get(user_email);
+  console.log(is_hidden.hide_page_info);
+  return is_hidden.hide_page_info;
+}
+
+function updateUserHidePageInfo(user_email, new_value) {
+  const out = db
+    .prepare("UPDATE users SET hide_page_info = ? WHERE email = ?")
+    .run(new_value, user_email);
+  console.log("updated user hide_page_info to", new_value);
+  return `updated user hide_page_info to ${new_value}`;
+}
+
 export {
   initUser,
   getCSV,
@@ -389,6 +406,8 @@ export {
   sequenceSchema,
   getSequences,
   insertDBItem,
+  getUserHidePageInfo,
+  updateUserHidePageInfo,
   deleteSequence,
   getWorkouts,
   workoutSchema,

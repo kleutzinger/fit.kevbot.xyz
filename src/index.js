@@ -50,6 +50,8 @@ import {
   insertDBItem,
   sequenceSchema,
   getSequences,
+  getUserHidePageInfo,
+  updateUserHidePageInfo,
   deleteSequence,
   workoutSchema,
   deleteWorkout,
@@ -384,6 +386,7 @@ app.get("/edit-machines", (req, res) => {
   res.render("edit-page", {
     layout: "page",
     theme: getUserTheme(user_email),
+    hide_page_info: getUserHidePageInfo(user_email),
     user: req.oidc.user,
     items: getMachines(user_email),
     endpoint: "machine",
@@ -392,11 +395,19 @@ app.get("/edit-machines", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  res.render("admin", { layout: "page", theme: getUserTheme(req2email(req)) });
+  res.render("admin", {
+    layout: "page",
+    theme: getUserTheme(req2email(req)),
+    hide_page_info: getUserHidePageInfo(req2email(req)),
+  });
 });
 
 app.get("/graph", (req, res) => {
-  res.render("graph", { layout: "page", theme: getUserTheme(req2email(req)) });
+  res.render("graph", {
+    layout: "page",
+    theme: getUserTheme(req2email(req)),
+    hide_page_info: getUserHidePageInfo(req2email(req)),
+  });
 });
 
 app.get("/sequence-delete-buttons", (req, res) => {
@@ -459,6 +470,33 @@ app.get("/machine-links", (req, res) => {
   );
 });
 
+app.get("/hide-page-info-button", (req, res) => {
+  const user_email = req2email(req);
+  console.log("User email:", user_email);
+  if (req.query.hide !== undefined) {
+    console.log("Hide query parameter:", req.query.hide);
+    if (req.query.hide == "true") {
+      updateUserHidePageInfo(user_email, 1);
+      console.log("Updated user hide page info to 1");
+    } else {
+      updateUserHidePageInfo(user_email, 0);
+      console.log("Updated user hide page info to 0");
+    }
+  }
+  const isHidden = !!getUserHidePageInfo(user_email);
+  const buttonText = isHidden ? "Show Page Info" : "Hide Page Info";
+  const button = a(
+    {
+      class: "btn btn-accent",
+      "hx-get":
+        "/hide-page-info-button" + (isHidden ? "?hide=false" : "?hide=true"),
+      "hx-swap": "outerHTML",
+    },
+    buttonText,
+  );
+  res.send(button);
+});
+
 app.get("/theme-update-links", (req, res) => {
   const user_theme = getUserTheme(req2email(req));
   const themeLinks = themes
@@ -516,6 +554,7 @@ app.get("/", (req, res) => {
     layout: "page",
     user: req.oidc.user,
     theme: getUserTheme(user_email),
+    hide_page_info: getUserHidePageInfo(user_email),
     machine_ids,
   });
 });

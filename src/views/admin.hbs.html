@@ -3,6 +3,12 @@
   <a class="btn btn-primary" href="/logout">log out</a>
   <a class="btn btn-primary" href="/download-csv">download-csv</a>
   <a class="btn btn-primary" href="/download-json">download-json</a>
+  <br />
+  <div
+    hx-get="/hide-page-info-button"
+    hx-swap="outerHTML"
+    hx-trigger="load"
+  ></div>
   <h1 class="text-3xl">Update theme:</h1>
   <div hx-get="/theme-update-links" hx-swap="innerHTML" hx-trigger="load"></div>
   <input
