@@ -12,6 +12,8 @@ const verbose = process.env.NODE_ENV === "development" ? console.log : null;
 const db = new Database(DB_PATH, { verbose });
 db.pragma("journal_mode = WAL");
 
+// An individual lift, like 10 reps of 100 on Bench Press Machine at 5:02 PM
+// We store a history of these to track progress
 const workoutSchema = z.object({
   id: z.coerce.number().int().optional(),
   weight: z.coerce.number().default(0),
@@ -25,6 +27,10 @@ const workoutSchema = z.object({
   machine_id: z.coerce.number().int(),
 });
 
+// An individual machine, like Bench Press or Stair Master
+// 'active' means wether that metric applies to the machine
+// i.e. Bench Press has weight and reps active, but not distance or energy
+// while treadmill has distance and duration active, but not weight or reps
 const machineSchema = z.object({
   id: z.coerce.number().int().optional(),
   name: z.string(),
@@ -39,6 +45,7 @@ const machineSchema = z.object({
   energy_active: z.coerce.number().int().default(0),
 });
 
+// A user in the DB
 const userSchema = z.object({
   id: z.coerce.number().int().optional(),
   email: z.string().email(),
@@ -48,13 +55,16 @@ const userSchema = z.object({
   hide_page_info: z.coerce.boolean().default(false),
 });
 
+// A sequence of machines, like a workout routine
+// e.g. "Bench Press, Squats, Deadlifts"
+// This is for the UI mostly and making workout routines like 'Leg Day'
 const sequenceSchema = z.object({
   id: z.coerce.number().int().optional(),
   user_email: z.string().email(),
   note: z.string().optional(),
   name: z.string(),
   // machine_ids must be of the form "1,2,3,4"
-  machine_ids: z.string().regex(/^\d+(,\d+)*$/),
+  machine_ids: z.string().regex(/^\d+(,\d+)*$/),  // this is not very SQL-y
   date_created: z.coerce.string().datetime(),
   date_updated: z.coerce.string().datetime(),
 });
